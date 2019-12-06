@@ -1,0 +1,19 @@
+{
+    "name": "PrefsGUISyncEditor",
+    "references": [
+        "GUID:7b68978d0ba23bf419a515a760f2be88",
+        "GUID:436548315e6ca5b499a1008921425bfb",
+        "GUID:e295d064953ab4d448060d2c2a386f0f",
+        "GUID:a44f47cf3ada4435dbc516bad0bc86fe"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}
