@@ -30,7 +30,7 @@ This inherits from `NetworkBehaivour`, so take steps to make it work(call `Spawn
 <br>
 All prefs are automatically synchronized between the server and client!
 
-###Don’t want to sync some prefs
+### Don’t want to sync some prefs
 Disable sync toggle at the **EditorWindow**(See the section below).
 or Set prefs's key to `PrefsGUISyncUNet.ignoreKeys` at the inspector.
 
@@ -39,9 +39,10 @@ or Set prefs's key to `PrefsGUISyncUNet.ignoreKeys` at the inspector.
 - **Window -> PrefsGUI**
 - You can set whether to synchronize with the sync toggle
 
-#Reference
+# Reference
 - **RapidGUI**  
 https://github.com/fuqunaga/RapidGUI
 <br>
+
 - **PrefsGUI**  
 https://github.com/fuqunaga/PrefsGUI
