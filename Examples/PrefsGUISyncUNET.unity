@@ -384,8 +384,8 @@ MonoBehaviour:
   m_PlayerPrefab: {fileID: 0}
   m_AutoCreatePlayer: 0
   m_PlayerSpawnMethod: 0
-  m_OfflineScene: PrefsGUISync_Offline
-  m_OnlineScene: PrefsGUISync_Online
+  m_OfflineScene: PrefsGUISyncUNET_Offline
+  m_OnlineScene: PrefsGUISyncUNET_Online
   m_SpawnPrefabs: []
   m_CustomConfig: 0
   m_MaxConnections: 4
