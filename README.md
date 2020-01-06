@@ -24,7 +24,7 @@ Add following line to the `dependencies` section in the `Packages/manifest.json`
 ```
 
 # Usage
-![EditorWindow](Documentation~/PrefsGUISyncObj.png)
+![EditorWindow](Documentation~/PrefsGUISyncObj.png)  
 Put **PrefsGUISyncUNET** game object to the scene.  
 This inherits from `NetworkBehaivour`, so take steps to make it work(call `Spawn()` or put on the online scene).
 <br>
