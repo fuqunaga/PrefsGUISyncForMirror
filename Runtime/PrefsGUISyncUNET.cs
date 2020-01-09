@@ -51,7 +51,7 @@ namespace PrefsGUI.Sync.UNET
         Dictionary<Type, ISyncListKeyObj> typeToSyncList;
         Dictionary<string, TypeAndIdx> keyToTypeIdx = new Dictionary<string, TypeAndIdx>();
 
-        public List<string> ignoreKeys = new List<string>(); // want use HashSet but use List so it will be serialized on Inspector
+        public readonly List<string> ignoreKeys = new List<string>(); // want use HashSet but use List so it will be serialized on Inspector
 
 
         public void Awake()
@@ -105,38 +105,41 @@ namespace PrefsGUI.Sync.UNET
         [ServerCallback]
         void SendPrefs()
         {
-            PrefsParam.all.Values
-                .Where(prefs => !ignoreKeys.Contains(prefs.key))
-                .ToList().ForEach(prefs =>
+            var all = PrefsParam.all;
+
+            // use Select() not ToList().ForEach() for avoid alloc
+            all.Keys.Except(ignoreKeys).Select(key =>
+            {
+                var prefs = all[key];
+                var obj = prefs.GetObject();
+                if (obj != null)
                 {
-                    var key = prefs.key;
-                    var obj = prefs.GetObject();
-                    if (obj != null)
+                    var type = prefs.GetInnerType();
+                    if (type.IsEnum)
                     {
-                        var type = prefs.GetInnerType();
-                        if (type.IsEnum)
-                        {
-                            type = typeof(int);
-                            obj = Convert.ToInt32(obj);
-                        }
-
-                        if (keyToTypeIdx.TryGetValue(key, out var ti))
-                        {
-                            var iSynList = typeToSyncList[type];
-                            iSynList.Set(ti.idx, obj);
-                        }
-                        else
-                        {
-                            Assert.IsTrue(typeToSyncList.ContainsKey(type),
-                                string.Format($"type [{type}] is not supported."));
-
-                            var iSynList = typeToSyncList[type];
-                            var idx = iSynList.Count;
-                            iSynList.Add(key, obj);
-                            keyToTypeIdx[key] = new TypeAndIdx() {type = type, idx = idx};
-                        }
+                        type = typeof(int);
+                        obj = Convert.ToInt32(obj);
                     }
-                });
+
+                    if (keyToTypeIdx.TryGetValue(key, out var ti))
+                    {
+                        var iSynList = typeToSyncList[type];
+                        iSynList.Set(ti.idx, obj);
+                    }
+                    else
+                    {
+                        Assert.IsTrue(typeToSyncList.ContainsKey(type),
+                            string.Format($"type [{type}] is not supported."));
+
+                        var iSynList = typeToSyncList[type];
+                        var idx = iSynList.Count;
+                        iSynList.Add(key, obj);
+                        keyToTypeIdx[key] = new TypeAndIdx() { type = type, idx = idx };
+                    }
+                }
+
+                return 0;
+            });
 
             materialPropertyDebugMenuUpdate = MaterialPropertyDebugMenu.update;
         }
