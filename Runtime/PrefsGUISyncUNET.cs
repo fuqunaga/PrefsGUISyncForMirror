@@ -16,10 +16,11 @@ namespace PrefsGUI.Sync.UNET
     {
         #region Type Define
 
-        public class TypeAndIdx
+        public class KeyData
         {
             public Type type;
             public int idx;
+            public object objCache;
         }
 
         #endregion
@@ -42,14 +43,13 @@ namespace PrefsGUI.Sync.UNET
         SyncListKeyBounds syncListKeyBounds = new SyncListKeyBounds();
         SyncListKeyBoundsInt syncListKeyBoundsInt = new SyncListKeyBoundsInt();
 
-
         [SyncVar] bool materialPropertyDebugMenuUpdate;
 
         #endregion
 
 
         Dictionary<Type, ISyncListKeyObj> typeToSyncList;
-        Dictionary<string, TypeAndIdx> keyToTypeIdx = new Dictionary<string, TypeAndIdx>();
+        Dictionary<string, KeyData> keyDatas = new Dictionary<string, KeyData>();
 
         public readonly List<string> ignoreKeys = new List<string>(); // want use HashSet but use List so it will be serialized on Inspector
 
@@ -57,19 +57,19 @@ namespace PrefsGUI.Sync.UNET
         public void Awake()
         {
             typeToSyncList = new ISyncListKeyObj[]
-                {
-                    syncListKeyBool,
-                    syncListKeyInt,
-                    syncListKeyUInt,
-                    syncListKeyFloat,
-                    syncListKeyString,
-                    syncListKeyColor,
-                    syncListKeyVector2,
-                    syncListKeyVector3,
-                    syncListKeyVector4,
-                    syncListKeyRect,
-                }
-                .ToDictionary(sl => sl.GetType().BaseType.GetGenericArguments()[0].GetField("value").FieldType);
+            {
+                syncListKeyBool,
+                syncListKeyInt,
+                syncListKeyUInt,
+                syncListKeyFloat,
+                syncListKeyString,
+                syncListKeyColor,
+                syncListKeyVector2,
+                syncListKeyVector3,
+                syncListKeyVector4,
+                syncListKeyRect,
+            }
+            .ToDictionary(sl => sl.GetType().BaseType.GetGenericArguments()[0].GetField("value").FieldType);
 
             typeToSyncList[typeof(Vector2Int)] = syncListKeyVector2Int;
             typeToSyncList[typeof(Vector3Int)] = syncListKeyVector3Int;
@@ -77,11 +77,6 @@ namespace PrefsGUI.Sync.UNET
             typeToSyncList[typeof(BoundsInt)] = syncListKeyBoundsInt;
         }
 
-        public override void OnStartServer()
-        {
-            base.OnStartServer();
-            NetworkServer.SpawnObjects();
-        }
 
         public override void OnStartClient()
         {
@@ -101,47 +96,56 @@ namespace PrefsGUI.Sync.UNET
             ReadPrefs();
         }
 
+        static PrefsParam[] tmpPrefsArray = new PrefsParam[0];
 
         [ServerCallback]
         void SendPrefs()
         {
-            var all = PrefsParam.all;
-
-            // use Select() not ToList().ForEach() for avoid alloc
-            all.Keys.Except(ignoreKeys).Select(key =>
+            foreach (var prefs in PrefsParam.all)
             {
-                var prefs = all[key];
-                var obj = prefs.GetObject();
-                if (obj != null)
+                var key = prefs.key;
+
+                if (!ignoreKeys.Contains(key))
                 {
-                    var type = prefs.GetInnerType();
-                    if (type.IsEnum)
+                    var obj = prefs.GetObject();
+                    if (obj != null)
                     {
-                        type = typeof(int);
-                        obj = Convert.ToInt32(obj);
-                    }
+                        var type = prefs.GetInnerType();
+                        if (type.IsEnum)
+                        {
+                            type = typeof(int);
+                            obj = Convert.ToInt32(obj);
+                        }
 
-                    if (keyToTypeIdx.TryGetValue(key, out var ti))
-                    {
-                        var iSynList = typeToSyncList[type];
-                        iSynList.Set(ti.idx, obj);
-                    }
-                    else
-                    {
-                        Assert.IsTrue(typeToSyncList.ContainsKey(type),
-                            string.Format($"type [{type}] is not supported."));
+                        if (keyDatas.TryGetValue(key, out var keyData))
+                        {
+                            var iSynList = typeToSyncList[type];
+                            if (!keyData.objCache.Equals(obj))
+                            {
+                                iSynList.Set(keyData.idx, key, obj);
+                            }
+                        }
+                        else
+                        {
+                            if (typeToSyncList.ContainsKey(type))
+                            {
+                                Assert.IsTrue(typeToSyncList.ContainsKey(type),
+                                    string.Format($"type [{type}] is not supported."));
 
-                        var iSynList = typeToSyncList[type];
-                        var idx = iSynList.Count;
-                        iSynList.Add(key, obj);
-                        keyToTypeIdx[key] = new TypeAndIdx() { type = type, idx = idx };
+                                var iSynList = typeToSyncList[type];
+                                var idx = iSynList.Count;
+                                iSynList.Add(key, obj);
+                                keyDatas[key] = new KeyData() { type = type, idx = idx, objCache = obj };
+                            }
+                        }
                     }
                 }
+            }
 
-                return 0;
-            });
-
-            materialPropertyDebugMenuUpdate = MaterialPropertyDebugMenu.update;
+            if (materialPropertyDebugMenuUpdate != MaterialPropertyDebugMenu.update)
+            {
+                materialPropertyDebugMenuUpdate = MaterialPropertyDebugMenu.update;
+            }
         }
 
         [ClientCallback]
@@ -150,12 +154,12 @@ namespace PrefsGUI.Sync.UNET
             // ignore at "Host"
             if (!NetworkServer.active)
             {
-                var all = PrefsParam.all;
+                var all = PrefsParam.allDic;
                 typeToSyncList.Values.ToList().ForEach(sl =>
                 {
                     for (var i = 0; i < sl.Count; ++i)
                     {
-                        (string key, object obj) = sl.Get(i);
+                        var (key, obj) = sl.Get(i);
 
                         if (all.TryGetValue(key, out var prefs))
                         {

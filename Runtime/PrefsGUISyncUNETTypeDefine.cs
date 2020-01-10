@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using UnityEngine;
-using UnityEngine.Assertions;
+﻿using UnityEngine;
 using UnityEngine.Networking;
 
 #pragma warning disable 0618  
@@ -13,8 +9,14 @@ namespace PrefsGUI.Sync.UNET
     {
         public interface ISyncListKeyObj
         {
+            (string key, object obj) Get(int i);
+            void Set(int i, string key, object obj);
+            void Add(string key, object obj);
             int Count { get; }
         }
+
+
+        #region KeyObj
 
         public struct KeyBool { public string key; public bool value; }
         public struct KeyInt { public string key; public int value; }
@@ -31,206 +33,144 @@ namespace PrefsGUI.Sync.UNET
         public struct KeyBounds { public string key; public Bounds_ value; }
         public struct KeyBoundsInt { public string key; public BoundsInt_ value; }
 
+        #endregion
 
-        public class SyncListKeyBool : SyncListStruct<KeyBool>, ISyncListKeyObj { }
-        public class SyncListKeyInt : SyncListStruct<KeyInt>, ISyncListKeyObj { }
-        public class SyncListKeyUInt : SyncListStruct<KeyUInt>, ISyncListKeyObj { }
-        public class SyncListKeyFloat : SyncListStruct<KeyFloat>, ISyncListKeyObj { }
-        public class SyncListKeyString : SyncListStruct<KeyString>, ISyncListKeyObj { }
-        public class SyncListKeyColor : SyncListStruct<KeyColor>, ISyncListKeyObj { }
-        public class SyncListKeyVector2 : SyncListStruct<KeyVector2>, ISyncListKeyObj { }
-        public class SyncListKeyVector3 : SyncListStruct<KeyVector3>, ISyncListKeyObj { }
-        public class SyncListKeyVector4 : SyncListStruct<KeyVector4>, ISyncListKeyObj { }
-        public class SyncListKeyVector2Int : SyncListStruct<KeyVector2Int>, ISyncListKeyObj { }
-        public class SyncListKeyVector3Int : SyncListStruct<KeyVector3Int>, ISyncListKeyObj { }
-        public class SyncListKeyRect : SyncListStruct<KeyRect>, ISyncListKeyObj { }
-        public class SyncListKeyBounds : SyncListStruct<KeyBounds>, ISyncListKeyObj { }
-        public class SyncListKeyBoundsInt : SyncListStruct<KeyBoundsInt>, ISyncListKeyObj { }
 
+        #region SyncListKeyObj
+
+        public class SyncListKeyBool : SyncListStruct<KeyBool>, ISyncListKeyObj
+        {
+            public (string key, object obj) Get(int i) { var v = this[i]; return (v.key, v.value); }
+            public void Set(int i, string key, object obj) => this[i] = new KeyBool() { key = key, value = (bool)obj };
+            public void Add(string key, object obj) => Add(new KeyBool() { key = key, value = (bool)obj });
+        }
+        
+        public class SyncListKeyInt : SyncListStruct<KeyInt>, ISyncListKeyObj
+        {
+            public (string key, object obj) Get(int i) { var v = this[i]; return (v.key, v.value); }
+            public void Set(int i, string key, object obj) => this[i] = new KeyInt() { key = key, value = (int)obj };
+            public void Add(string key, object obj) => Add(new KeyInt() { key = key, value = (int)obj });
+        }
+
+        public class SyncListKeyUInt : SyncListStruct<KeyUInt>, ISyncListKeyObj
+        {
+            public (string key, object obj) Get(int i) { var v = this[i]; return (v.key, v.value); }
+            public void Set(int i, string key, object obj) => this[i] = new KeyUInt() { key = key, value = (uint)obj };
+            public void Add(string key, object obj) => Add(new KeyUInt() { key = key, value = (uint)obj });
+        }
+
+        public class SyncListKeyFloat : SyncListStruct<KeyFloat>, ISyncListKeyObj
+        {
+            public (string key, object obj) Get(int i) { var v = this[i]; return (v.key, v.value); }
+            public void Set(int i, string key, object obj) => this[i] = new KeyFloat() { key = key, value = (float)obj };
+            public void Add(string key, object obj) => Add(new KeyFloat() { key = key, value = (float)obj });
+        }
+
+        public class SyncListKeyString : SyncListStruct<KeyString>, ISyncListKeyObj
+        {
+            public (string key, object obj) Get(int i) { var v = this[i]; return (v.key, v.value); }
+            public void Set(int i, string key, object obj) => this[i] = new KeyString() { key = key, value = (string)obj };
+            public void Add(string key, object obj) => Add(new KeyString() { key = key, value = (string)obj });
+        }
+
+        public class SyncListKeyColor : SyncListStruct<KeyColor>, ISyncListKeyObj
+        {
+            public (string key, object obj) Get(int i) { var v = this[i]; return (v.key, v.value); }
+            public void Set(int i, string key, object obj) => this[i] = new KeyColor() { key = key, value = (Color)obj };
+            public void Add(string key, object obj) => Add(new KeyColor() { key = key, value = (Color)obj });
+        }
+
+        public class SyncListKeyVector2 : SyncListStruct<KeyVector2>, ISyncListKeyObj
+        {
+            public (string key, object obj) Get(int i) { var v = this[i]; return (v.key, v.value); }
+            public void Set(int i, string key, object obj) => this[i] = new KeyVector2() { key = key, value = (Vector2)obj };
+            public void Add(string key, object obj) => Add(new KeyVector2() { key = key, value = (Vector2)obj });
+        }
+
+        public class SyncListKeyVector3 : SyncListStruct<KeyVector3>, ISyncListKeyObj
+        {
+            public (string key, object obj) Get(int i) { var v = this[i]; return (v.key, v.value); }
+            public void Set(int i, string key, object obj) => this[i] = new KeyVector3() { key = key, value = (Vector3)obj };
+            public void Add(string key, object obj) => Add(new KeyVector3() { key = key, value = (Vector3)obj });
+        }
+
+        public class SyncListKeyVector4 : SyncListStruct<KeyVector4>, ISyncListKeyObj
+        {
+            public (string key, object obj) Get(int i) { var v = this[i]; return (v.key, v.value); }
+            public void Set(int i, string key, object obj) => this[i] = new KeyVector4() { key = key, value = (Vector4)obj };
+            public void Add(string key, object obj) => Add(new KeyVector4() { key = key, value = (Vector4)obj });
+        }
+
+        public class SyncListKeyVector2Int : SyncListStruct<KeyVector2Int>, ISyncListKeyObj
+        {
+            public (string key, object obj) Get(int i) { var v = this[i]; return (v.key, (Vector2Int)v.value); }
+            public void Set(int i, string key, object obj) => this[i] = new KeyVector2Int() { key = key, value = (Vector2Int)obj };
+            public void Add(string key, object obj) => Add(new KeyVector2Int() { key = key, value = (Vector2Int)obj });
+        }
+
+        public class SyncListKeyVector3Int : SyncListStruct<KeyVector3Int>, ISyncListKeyObj
+        {
+            public (string key, object obj) Get(int i) { var v = this[i]; return (v.key, (Vector3Int)v.value); }
+            public void Set(int i, string key, object obj) => this[i] = new KeyVector3Int() { key = key, value = (Vector3Int)obj };
+            public void Add(string key, object obj) => Add(new KeyVector3Int() { key = key, value = (Vector3Int)obj });
+        }
+
+        public class SyncListKeyRect : SyncListStruct<KeyRect>, ISyncListKeyObj
+        {
+            public (string key, object obj) Get(int i) { var v = this[i]; return (v.key, v.value); }
+            public void Set(int i, string key, object obj) => this[i] = new KeyRect() { key = key, value = (Rect)obj };
+            public void Add(string key, object obj) => Add(new KeyRect() { key = key, value = (Rect)obj });
+        }
+
+        public class SyncListKeyBounds : SyncListStruct<KeyBounds>, ISyncListKeyObj
+        {
+            public (string key, object obj) Get(int i) { var v = this[i]; return (v.key, (Bounds)v.value); }
+            public void Set(int i, string key, object obj) => this[i] = new KeyBounds() { key = key, value = (Bounds)obj };
+            public void Add(string key, object obj) => Add(new KeyBounds() { key = key, value = (Bounds)obj });
+        }
+
+        public class SyncListKeyBoundsInt : SyncListStruct<KeyBoundsInt>, ISyncListKeyObj
+        {
+            public (string key, object obj) Get(int i) { var v = this[i]; return (v.key, (BoundsInt)v.value); }
+            public void Set(int i, string key, object obj) => this[i] = new KeyBoundsInt() { key = key, value = (BoundsInt)obj };
+            public void Add(string key, object obj) => Add(new KeyBoundsInt() { key = key, value = (BoundsInt)obj });
+        }
+
+        #endregion
+
+
+        #region Substitute for strcut that out of UNet support 
 
         public struct Vector2Int_
         {
             public int x, y;
 
-            static public Vector2Int_ ConvertFrom(Vector2Int v) => new Vector2Int_() { x = v.x, y = v.y, };
-            public Vector2Int ConvertTo() => new Vector2Int(x, y);
+            public static implicit operator Vector2Int_(Vector2Int v) => new Vector2Int_() { x = v.x, y = v.y };
+            public static implicit operator Vector2Int(Vector2Int_ v) => new Vector2Int(v.x, v.y);
         }
 
         public struct Vector3Int_
         {
             public int x, y, z;
 
-            static public Vector3Int_ ConvertFrom(Vector3Int v) => new Vector3Int_() { x = v.x, y = v.y, z = v.z };
-            public Vector3Int ConvertTo() => new Vector3Int(x, y, z);
+            public static implicit operator Vector3Int_(Vector3Int v) => new Vector3Int_() { x = v.x, y = v.y, z = v.z };
+            public static implicit operator Vector3Int(Vector3Int_ v) => new Vector3Int(v.x, v.y, v.z);
         }
 
         public struct Bounds_
         {
             public Vector3 center, size;
 
-
-            static public Bounds_ ConvertFrom(Bounds v) => new Bounds_() { center = v.center, size = v.size };
-            public Bounds ConvertTo() => new Bounds(center, size);
+            public static implicit operator Bounds_(Bounds v) => new Bounds_() { center = v.center, size = v.size };
+            public static implicit operator Bounds(Bounds_ v) => new Bounds() { center = v.center, size = v.size };
         }
 
         public struct BoundsInt_
         {
             public Vector3Int_ position, size;
 
-            static public BoundsInt_ ConvertFrom(BoundsInt v) => new BoundsInt_() { position = Vector3Int_.ConvertFrom(v.position), size = Vector3Int_.ConvertFrom(v.size) };
-            public BoundsInt ConvertTo() => new BoundsInt(position.ConvertTo(), size.ConvertTo());
-        }
-    }
-
-
-
-    public static class ISyncListKeyObjExtenion
-    {
-        static object CreateInstance(string key, object obj, Type keyObjeType)
-        {
-            var ret = Activator.CreateInstance(keyObjeType);
-            var kvField = GetField(keyObjeType);
-
-            kvField.keyField.SetValue(ret, key);
-
-            obj = kvField.valueConvertFrom?.Invoke(null, new[] { obj }) ?? obj;
-            kvField.valueField.SetValue(ret, obj);
-
-            return ret;
-        }
-
-
-
-        public static void Set(this PrefsGUISyncUNET.ISyncListKeyObj me, int idx, object obj)
-        {
-            var listObj = new ListObj(me);
-
-            var keyValue = new KVObj(listObj[idx]);
-            if (false == keyValue.value.Equals(obj))
-            {
-                listObj[idx] = CreateInstance(keyValue.key, obj, listObj.elementType);
-            }
-        }
-
-        public static void Add(this PrefsGUISyncUNET.ISyncListKeyObj me, string key, object obj)
-        {
-            var listObj = new ListObj(me);
-            listObj.Add(CreateInstance(key, obj, listObj.elementType));
-        }
-
-        public static (string, object) Get(this PrefsGUISyncUNET.ISyncListKeyObj me, int idx)
-        {
-            var listObj = new ListObj(me);
-            var kvObj = new KVObj(listObj[idx]);
-
-            return (kvObj.key, kvObj.value);
-        }
-
-
-
-        #region Reflection Utility
-
-        public class KVField
-        {
-            public FieldInfo keyField;
-            public FieldInfo valueField;
-            public MethodInfo valueConvertFrom;
-            public MethodInfo valueConvertTo;
-        }
-
-        public class ListInfo
-        {
-            public Type elementType;
-            public PropertyInfo indexer;
-            public MethodInfo add;
-        }
-
-        protected class KVObj
-        {
-            object obj;
-            KVField info;
-
-            public KVObj(object obj)
-            {
-                this.obj = obj;
-                info = GetField(obj.GetType());
-            }
-
-            public string key
-            {
-                get { return (string)info.keyField.GetValue(obj); }
-                set { info.keyField.SetValue(obj, value); }
-            }
-            public object value
-            {
-                get
-                {
-                    var ret = info.valueField.GetValue(obj);
-                    return info.valueConvertTo?.Invoke(ret, null) ?? ret;
-                }
-            }
-        }
-
-        protected class ListObj
-        {
-            object obj;
-            ListInfo info;
-            public Type elementType => info.elementType;
-
-            public ListObj(object obj)
-            {
-                this.obj = obj;
-                info = GetListInfo(obj.GetType());
-            }
-
-            public object this[int idx]
-            {
-                get => info.indexer.GetValue(obj, new object[] { idx });
-                set => info.indexer.SetValue(obj, value, new object[] { idx });
-            }
-
-            public void Add(object value)
-            {
-                info.add.Invoke(obj, new[] { value });
-            }
-        }
-
-
-        static Dictionary<Type, KVField> typeToField = new Dictionary<Type, KVField>();
-        static Dictionary<Type, ListInfo> typeToListInfo = new Dictionary<Type, ListInfo>();
-
-        static KVField GetField(Type type)
-        {
-            if (!typeToField.TryGetValue(type, out var kvField))
-            {
-                var valueField = type.GetField("value");
-                var valueType = valueField.FieldType;
-                typeToField[type] = kvField = new KVField()
-                {
-                    keyField = type.GetField("key"),
-                    valueField = valueField,
-                    valueConvertFrom = valueType.GetMethod("ConvertFrom", BindingFlags.Public | BindingFlags.Static),
-                    valueConvertTo = valueType.GetMethod("ConvertTo"),
-                };
-            }
-            return kvField;
-        }
-
-        static ListInfo GetListInfo(Type type)
-        {
-            if (!typeToListInfo.TryGetValue(type, out var info))
-            {
-                Assert.IsTrue(type.BaseType.IsGenericType);
-
-                typeToListInfo[type] = info = new ListInfo()
-                {
-                    elementType = type.BaseType.GetGenericArguments()[0],
-                    indexer = type.GetProperty("Item"),
-                    add = type.GetMethod("Add")
-                };
-            }
-
-            return info;
+            public static implicit operator BoundsInt_(BoundsInt v) => new BoundsInt_() { position = v.position, size = v.size };
+            public static implicit operator BoundsInt(BoundsInt_ v) => new BoundsInt() { position = v.position, size = v.size };
         }
 
         #endregion
