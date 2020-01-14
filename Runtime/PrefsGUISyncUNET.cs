@@ -12,6 +12,7 @@ namespace PrefsGUI.Sync.UNET
     /// <summary>
     /// Sync PrefsGUI parameter over UNET
     /// </summary>
+    [DefaultExecutionOrder(-1)]
     public partial class PrefsGUISyncUNET : NetworkBehaviour
     {
         #region Type Define
@@ -148,31 +149,45 @@ namespace PrefsGUI.Sync.UNET
             }
         }
 
+
+        List<ISyncListKeyObj> syncLists;
+
         [ClientCallback]
         void ReadPrefs(bool checkAlreadyGet = false)
         {
             // ignore at "Host"
             if (!NetworkServer.active)
             {
-                var all = PrefsParam.allDic;
-                typeToSyncList.Values.ToList().ForEach(sl =>
+                if (syncLists == null)
+                {
+                    syncLists = typeToSyncList.Values.ToList();
+                }
+
+                var alreadyGet = false;
+                void OnIfAlreadyGet()
+                {
+                    alreadyGet = true;
+                }
+
+                var allDic = PrefsParam.allDic;
+                foreach (var sl in syncLists)
                 {
                     for (var i = 0; i < sl.Count; ++i)
                     {
                         var (key, obj) = sl.Get(i);
 
-                        if (all.TryGetValue(key, out var prefs))
+                        if (allDic.TryGetValue(key, out var prefs))
                         {
-                            var onIfAlreadyGet = checkAlreadyGet
-                                ? new Action(() =>
-                                    Debug.LogWarning(
-                                        $"key:[{prefs.key}] Get() before synced. before:[{prefs.GetObject()}] sync:[{obj}]"))
-                                : null;
+                            alreadyGet = false;
+                            prefs.SetSyncedObject(obj, checkAlreadyGet ? OnIfAlreadyGet : (Action)null);
 
-                            prefs.SetSyncedObject(obj, onIfAlreadyGet);
+                            if ( alreadyGet )
+                            {
+                                Debug.LogWarning($"key:[{prefs.key}] Get() before synced. before:[{prefs.GetObject()}] sync:[{obj}]");
+                            }
                         }
                     }
-                });
+                }
             }
 
             MaterialPropertyDebugMenu.update = materialPropertyDebugMenuUpdate;
