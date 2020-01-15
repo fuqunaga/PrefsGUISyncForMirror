@@ -15,18 +15,6 @@ namespace PrefsGUI.Sync.UNET
     [DefaultExecutionOrder(-1)]
     public partial class PrefsGUISyncUNET : NetworkBehaviour
     {
-        #region Type Define
-
-        public class KeyData
-        {
-            public Type type;
-            public int idx;
-            public object objCache;
-        }
-
-        #endregion
-
-
         #region Sync
 
         SyncListKeyBool syncListKeyBool = new SyncListKeyBool();
@@ -50,32 +38,30 @@ namespace PrefsGUI.Sync.UNET
 
 
         Dictionary<Type, ISyncListKeyObj> typeToSyncList;
-        Dictionary<string, KeyData> keyDatas = new Dictionary<string, KeyData>();
+        Dictionary<string, int> keyToIndex = new Dictionary<string, int>();
 
         public readonly List<string> ignoreKeys = new List<string>(); // want use HashSet but use List so it will be serialized on Inspector
 
 
         public void Awake()
         {
-            typeToSyncList = new ISyncListKeyObj[]
-            {
-                syncListKeyBool,
-                syncListKeyInt,
-                syncListKeyUInt,
-                syncListKeyFloat,
-                syncListKeyString,
-                syncListKeyColor,
-                syncListKeyVector2,
-                syncListKeyVector3,
-                syncListKeyVector4,
-                syncListKeyRect,
+            typeToSyncList = new ISyncListKeyObj[]{
+                SyncListKeyObjHelper.Create(syncListKeyBool),
+                SyncListKeyObjHelper.Create(syncListKeyInt),
+                SyncListKeyObjHelper.Create(syncListKeyUInt),
+                SyncListKeyObjHelper.Create(syncListKeyFloat),
+                SyncListKeyObjHelper.Create(syncListKeyString),
+                SyncListKeyObjHelper.Create(syncListKeyColor),
+                SyncListKeyObjHelper.Create(syncListKeyVector2),
+                SyncListKeyObjHelper.Create(syncListKeyVector3),
+                SyncListKeyObjHelper.Create(syncListKeyVector4),
+                SyncListKeyObjHelper.Create(syncListKeyRect),
+                SyncListKeyObjHelper.Create(syncListKeyVector2Int),
+                SyncListKeyObjHelper.Create(syncListKeyVector3Int),
+                SyncListKeyObjHelper.Create(syncListKeyBounds),
+                SyncListKeyObjHelper.Create(syncListKeyBoundsInt)
             }
-            .ToDictionary(sl => sl.GetType().BaseType.GetGenericArguments()[0].GetField("value").FieldType);
-
-            typeToSyncList[typeof(Vector2Int)] = syncListKeyVector2Int;
-            typeToSyncList[typeof(Vector3Int)] = syncListKeyVector3Int;
-            typeToSyncList[typeof(Bounds)] = syncListKeyBounds;
-            typeToSyncList[typeof(BoundsInt)] = syncListKeyBoundsInt;
+            .ToDictionary(sl => sl.ValueType);
         }
 
 
@@ -118,13 +104,10 @@ namespace PrefsGUI.Sync.UNET
                             obj = Convert.ToInt32(obj);
                         }
 
-                        if (keyDatas.TryGetValue(key, out var keyData))
+                        if (keyToIndex.TryGetValue(key, out var index))
                         {
-                            var iSynList = typeToSyncList[type];
-                            if (!keyData.objCache.Equals(obj))
-                            {
-                                iSynList.Set(keyData.idx, key, obj);
-                            }
+                            var sl = typeToSyncList[type];
+                            sl.Set(index, key, obj);
                         }
                         else
                         {
@@ -136,7 +119,8 @@ namespace PrefsGUI.Sync.UNET
                                 var iSynList = typeToSyncList[type];
                                 var idx = iSynList.Count;
                                 iSynList.Add(key, obj);
-                                keyDatas[key] = new KeyData() { type = type, idx = idx, objCache = obj };
+                                //keyToIndex[key] = new KeyData() { type = type, idx = idx, objCache = obj };
+                                keyToIndex[key] = idx;
                             }
                         }
                     }
@@ -164,10 +148,9 @@ namespace PrefsGUI.Sync.UNET
                 }
 
                 var alreadyGet = false;
-                void OnIfAlreadyGet()
-                {
-                    alreadyGet = true;
-                }
+                var alreadyGetFunc = checkAlreadyGet 
+                    ? () => alreadyGet = true
+                    : (Action)null;
 
                 var allDic = PrefsParam.allDic;
                 foreach (var sl in syncLists)
@@ -179,7 +162,7 @@ namespace PrefsGUI.Sync.UNET
                         if (allDic.TryGetValue(key, out var prefs))
                         {
                             alreadyGet = false;
-                            prefs.SetSyncedObject(obj, checkAlreadyGet ? OnIfAlreadyGet : (Action)null);
+                            prefs.SetSyncedObject(obj, alreadyGetFunc);
 
                             if ( alreadyGet )
                             {
