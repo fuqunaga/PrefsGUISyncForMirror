@@ -72,11 +72,6 @@ namespace PrefsGUI.Sync.UNET
         }
 
 
-        public void Start()
-        {
-            SendPrefs();
-        }
-
         public void Update()
         {
             SendPrefs();
@@ -148,7 +143,7 @@ namespace PrefsGUI.Sync.UNET
                 }
 
                 var alreadyGet = false;
-                var alreadyGetFunc = checkAlreadyGet 
+                var alreadyGetFunc = checkAlreadyGet
                     ? () => alreadyGet = true
                     : (Action)null;
 
@@ -164,7 +159,7 @@ namespace PrefsGUI.Sync.UNET
                             alreadyGet = false;
                             prefs.SetSyncedObject(obj, alreadyGetFunc);
 
-                            if ( alreadyGet )
+                            if (alreadyGet)
                             {
                                 Debug.LogWarning($"key:[{prefs.key}] Get() before synced. before:[{prefs.GetObject()}] sync:[{obj}]");
                             }
