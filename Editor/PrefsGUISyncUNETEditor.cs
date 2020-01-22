@@ -34,7 +34,7 @@ namespace PrefsGUI.Sync.UNET.Editor
             SyncToggle(sync, prefs);
         }
 
-        public void GUIGroupLabelLeft(List<PrefsParam> prefsList)
+        public void GUIGroupLabelLeft(IEnumerable<PrefsParam> prefsList)
         {
             SyncToggleList(sync, prefsList);
         }
@@ -77,7 +77,10 @@ namespace PrefsGUI.Sync.UNET.Editor
                     }
                     else
                     {
-                        keys.ForEach(k => sync.ignoreKeys.Remove(k));
+                        foreach (var key in keys)
+                        {
+                            sync.ignoreKeys.Remove(key);
+                        }
                     }
                 }
             }
