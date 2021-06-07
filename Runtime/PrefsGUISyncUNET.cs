@@ -40,7 +40,7 @@ namespace PrefsGUI.Sync.UNET
         Dictionary<Type, ISyncListKeyObj> typeToSyncList;
         Dictionary<string, int> keyToIndex = new Dictionary<string, int>();
 
-        public readonly List<string> ignoreKeys = new List<string>(); // want use HashSet but use List so it will be serialized on Inspector
+        public List<string> ignoreKeys = new List<string>(); // want use HashSet but use List so it will be serialized on Inspector
 
 
         public void Awake()
