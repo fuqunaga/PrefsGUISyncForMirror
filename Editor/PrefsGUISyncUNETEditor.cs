@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using PrefsGUI.Editor;
+using RapidGUI;
+using System.Collections.Generic;
 using System.Linq;
-using PrefsGUI.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -21,7 +22,7 @@ namespace PrefsGUI.Sync.UNET.Editor
 
 
         private PrefsGUISyncUNET sync;
-        
+
 
         public void GUIHeadLine()
         {
@@ -44,16 +45,19 @@ namespace PrefsGUI.Sync.UNET.Editor
         {
             if (sync != null)
             {
-                var key = prefs.key;
-                var isSync = !sync.ignoreKeys.Contains(key);
-
-                if (isSync != GUILayout.Toggle(isSync, GUIContent.none, PrefsGUIEditorBase.ToggleWidth))
+                using (new RGUI.EnabledScope(!Application.isPlaying))
                 {
-                    Undo.RecordObject(sync, "Change PrefsGUI sync flag");
-                    EditorUtility.SetDirty(sync);
+                    var key = prefs.key;
+                    var isSync = !sync.ignoreKeys.Contains(key);
 
-                    if (isSync) sync.ignoreKeys.Add(key);
-                    else sync.ignoreKeys.Remove(key);
+                    if (isSync != GUILayout.Toggle(isSync, GUIContent.none, PrefsGUIEditorBase.ToggleWidth))
+                    {
+                        Undo.RecordObject(sync, "Change PrefsGUI sync flag");
+                        EditorUtility.SetDirty(sync);
+
+                        if (isSync) sync.ignoreKeys.Add(key);
+                        else sync.ignoreKeys.Remove(key);
+                    }
                 }
             }
         }
