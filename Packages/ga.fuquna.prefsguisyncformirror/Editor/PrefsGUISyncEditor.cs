@@ -5,7 +5,7 @@ using RapidGUI;
 using UnityEditor;
 using UnityEngine;
 
-namespace PrefsGUI.Sync.UNET.Editor
+namespace PrefsGUI.Sync.Editor
 {
     [InitializeOnLoad]
     public class PrefsGUISyncEditor : IPrefsGUIEditorExtension
@@ -21,12 +21,12 @@ namespace PrefsGUI.Sync.UNET.Editor
         #endregion
 
 
-        private PrefsGUISyncUNET sync;
+        private PrefsGUISyncForMirror sync;
 
 
         public void GUIHeadLine()
         {
-            sync = Object.FindObjectOfType<PrefsGUISyncUNET>();
+            sync = Object.FindObjectOfType<PrefsGUISyncForMirror>();
             if (sync != null) GUILayout.Label("Sync");
         }
 
@@ -41,7 +41,7 @@ namespace PrefsGUI.Sync.UNET.Editor
         }
 
 
-        void SyncToggle(PrefsGUISyncUNET sync, PrefsParam prefs)
+        void SyncToggle(PrefsGUISyncForMirror sync, PrefsParam prefs)
         {
             if (sync != null)
             {
@@ -62,7 +62,7 @@ namespace PrefsGUI.Sync.UNET.Editor
             }
         }
 
-        void SyncToggleList(PrefsGUISyncUNET sync, IEnumerable<PrefsParam> prefsList)
+        void SyncToggleList(PrefsGUISyncForMirror sync, IEnumerable<PrefsParam> prefsList)
         {
             if (sync != null)
             {

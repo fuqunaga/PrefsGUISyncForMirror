@@ -5,13 +5,13 @@ using Mirror;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace PrefsGUI.Sync.UNET
+namespace PrefsGUI.Sync
 {
     /// <summary>
     /// Sync PrefsGUI parameter over UNET
     /// </summary>
     [DefaultExecutionOrder(-1)]
-    public partial class PrefsGUISyncUNET : NetworkBehaviour
+    public partial class PrefsGUISyncForMirror : NetworkBehaviour
     {
         #region Sync
 

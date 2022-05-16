@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 
-namespace PrefsGUI.Sync.UNET
+namespace PrefsGUI.Sync
 {
-    public partial class PrefsGUISyncUNET : NetworkBehaviour
+    public partial class PrefsGUISyncForMirror : NetworkBehaviour
     {
         #region KeyObj
 
