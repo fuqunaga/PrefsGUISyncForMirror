@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2019 fuqunaga
+Copyright (c) 2022 fuqunaga
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
