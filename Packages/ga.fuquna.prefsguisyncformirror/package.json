@@ -1,18 +1,24 @@
 {
-    "name": "ga.fuquna.prefsguisyncunet",
-    "displayName": "PrefsGUISyncUNET",
-    "version": "1.0.1",
-    "unity": "2020.3",
-    "description": "PrefsGUI subset for synchronization over UNET",
-    "keywords": ["Preference", "GUI"],
+    "name": "ga.fuquna.prefsguisyncformirror",
+    "displayName": "PrefsGUISync for Mirror",
+    "version": "0.0.0",
+    "unity": "2021.3",
+    "description": "PrefsGUI subset for synchronization over Mirror",
+    "keywords": [
+        "unity",
+        "gui",
+        "preference",
+        "sync"
+    ],
     "category": "Tool",
     "dependencies": { 
-        "com.unity.multiplayer-hlapi": "1.0.4",
-        "ga.fuquna.prefsgui": "2.2.1"
+        "ga.fuquna.prefsgui": "3.0.0"
     },
     "author": {
         "name": "fuqunaga",
         "email": "fukhid@gmail.com",
         "url": "https://fuquna.ga"
-    }
+    },
+    "repository": "github:fuqunaga/PrefsGUIForMirror",
+    "license": "MIT"
 }
