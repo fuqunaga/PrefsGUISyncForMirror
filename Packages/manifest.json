@@ -10,6 +10,7 @@
     "com.unity.timeline": "1.6.4",
     "com.unity.ugui": "1.0.0",
     "com.unity.visualscripting": "1.7.6",
+    "com.veriorpies.parrelsync": "https://github.com/VeriorPies/ParrelSync.git?path=/ParrelSync",
     "ga.fuquna.prefsgui.rapidgui": "0.0.0",
     "ga.fuquna.prefsgui.rosettaui": "0.0.2",
     "ga.fuquna.rosettaui.uitoolkit": "0.0.5",
