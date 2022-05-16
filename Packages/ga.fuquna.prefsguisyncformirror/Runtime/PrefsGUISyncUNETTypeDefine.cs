@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
-using UnityEngine.Networking;
-
-#pragma warning disable 0618
 
 namespace PrefsGUI.Sync.UNET
 {
@@ -189,33 +187,33 @@ namespace PrefsGUI.Sync.UNET
 
         #region SyncListKey*
 
-        public class SyncListKeyBool : SyncListStruct<KeyBool> { }
+        public class SyncListKeyBool : SyncList<KeyBool> { }
 
-        public class SyncListKeyInt : SyncListStruct<KeyInt> { }
+        public class SyncListKeyInt : SyncList<KeyInt> { }
 
-        public class SyncListKeyUInt : SyncListStruct<KeyUInt> { }
+        public class SyncListKeyUInt : SyncList<KeyUInt> { }
 
-        public class SyncListKeyFloat : SyncListStruct<KeyFloat> { }
+        public class SyncListKeyFloat : SyncList<KeyFloat> { }
 
-        public class SyncListKeyString : SyncListStruct<KeyString> { }
+        public class SyncListKeyString : SyncList<KeyString> { }
 
-        public class SyncListKeyColor : SyncListStruct<KeyColor> { }
+        public class SyncListKeyColor : SyncList<KeyColor> { }
 
-        public class SyncListKeyVector2 : SyncListStruct<KeyVector2> { }
+        public class SyncListKeyVector2 : SyncList<KeyVector2> { }
 
-        public class SyncListKeyVector3 : SyncListStruct<KeyVector3> { }
+        public class SyncListKeyVector3 : SyncList<KeyVector3> { }
 
-        public class SyncListKeyVector4 : SyncListStruct<KeyVector4> { }
+        public class SyncListKeyVector4 : SyncList<KeyVector4> { }
 
-        public class SyncListKeyVector2Int : SyncListStruct<KeyVector2Int> { }
+        public class SyncListKeyVector2Int : SyncList<KeyVector2Int> { }
 
-        public class SyncListKeyVector3Int : SyncListStruct<KeyVector3Int> { }
+        public class SyncListKeyVector3Int : SyncList<KeyVector3Int> { }
 
-        public class SyncListKeyRect : SyncListStruct<KeyRect> { }
+        public class SyncListKeyRect : SyncList<KeyRect> { }
 
-        public class SyncListKeyBounds : SyncListStruct<KeyBounds> { }
+        public class SyncListKeyBounds : SyncList<KeyBounds> { }
 
-        public class SyncListKeyBoundsInt : SyncListStruct<KeyBoundsInt> { }
+        public class SyncListKeyBoundsInt : SyncList<KeyBoundsInt> { }
 
         #endregion
 
@@ -231,7 +229,7 @@ namespace PrefsGUI.Sync.UNET
 
         public static class SyncListKeyObjHelper
         {
-            public static SyncListKeyObj<T> Create<T>(SyncListStruct<T> sl)
+            public static SyncListKeyObj<T> Create<T>(SyncList<T> sl)
                 where T : struct, IKeyObj
             {
                 return new SyncListKeyObj<T>(sl);
@@ -241,14 +239,14 @@ namespace PrefsGUI.Sync.UNET
         public class SyncListKeyObj<TKeyObj> : ISyncListKeyObj
             where TKeyObj : struct, IKeyObj
         {
-            SyncListStruct<TKeyObj> sl;
+            SyncList<TKeyObj> sl;
             Dictionary<int, object> cachedObj = new Dictionary<int, object>();
 
 
-            public SyncListKeyObj(SyncListStruct<TKeyObj> sl)
+            public SyncListKeyObj(SyncList<TKeyObj> sl)
             {
                 this.sl = sl;
-                sl.Callback += (op, itemIndex) => RemoveCache(itemIndex);
+                sl.Callback += (op, itemIndex, _, _) => RemoveCache(itemIndex);
             }
 
             void RemoveCache(int i)

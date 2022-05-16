@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mirror;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Networking;
-
-#pragma warning disable 0618  
 
 namespace PrefsGUI.Sync.UNET
 {

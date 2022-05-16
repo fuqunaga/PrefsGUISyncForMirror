@@ -1,5 +1,5 @@
-# PrefsGUISync
-PrefsGUI subset for synchronization over UNET
+# PrefsGUISyncForMirror
+PrefsGUI subset for synchronization over Mirror
 
-## [1.0.0] - 2019-12-10
-- First release
+## [0.0.0] - 2022-05-??
+- first release
