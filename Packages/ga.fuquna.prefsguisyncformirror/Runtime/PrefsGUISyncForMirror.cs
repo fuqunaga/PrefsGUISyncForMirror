@@ -34,7 +34,6 @@ namespace PrefsGUI.Sync
 
         #endregion
 
-
         Dictionary<Type, ISyncListKeyObj> typeToSyncList;
         Dictionary<string, int> keyToIndex = new Dictionary<string, int>();
 

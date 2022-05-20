@@ -7,6 +7,8 @@ namespace PrefsGUI.RosettaUI.Example
     [RequireComponent(typeof(RosettaUIRoot))]
     public class PrefsGUIRosettaUIExample : MonoBehaviour
     {
+        public Vector2 position;
+        
         private void Start()
         {
             var root = GetComponent<RosettaUIRoot>();
@@ -16,13 +18,16 @@ namespace PrefsGUI.RosettaUI.Example
         Element CreateElement()
         {
             return UI.Window(
-                "RosettaUI",
+                "PrefsGUI - RosettaUI",
                 UI.WindowLauncher<PrefsGUIExample_Part1>("Part1"),
                 UI.WindowLauncher<PrefsGUIExample_Part2>("Part2"),
                 UI.WindowLauncher<PrefsGUIExample_Part3>("Part3"),
-                UI.WindowLauncher(UI.Window(nameof(PrefsSearch), PrefsSearch.CreateElement()))
-            );
-
+                UI.WindowLauncher(UI.Window(nameof(PrefsSearch), PrefsSearch.CreateElement())),
+                UI.Space().SetHeight(15f),
+                UI.Label(() => $"file path: {KVS.PrefsKVSPathSelector.path}"),
+                UI.Button(nameof(Prefs.Save), Prefs.Save),
+                UI.Button(nameof(Prefs.DeleteAll), Prefs.DeleteAll)
+            ).SetPosition(position);
         }
     }
 }
