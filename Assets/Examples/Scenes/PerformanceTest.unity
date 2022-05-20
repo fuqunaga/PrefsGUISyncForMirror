@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 623055788}
   - component: {fileID: 623055787}
+  - component: {fileID: 623055789}
   m_Layer: 0
   m_Name: PerformanceTest
   m_TagString: Untagged
@@ -152,11 +153,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b46dd5cb83e2168419afa144964cdac2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   uiRoot: {fileID: 1609987441}
   windowPosition: {x: 0, y: 150}
-  count: 10000
-  updateValue: 1
+  count: 1000
+  updatePrefsValues: 1
   prefsFloats: []
+  showPrefsIndex: 0
 --- !u!4 &623055788
 Transform:
   m_ObjectHideFlags: 0
@@ -172,6 +176,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &623055789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 623055786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 103478158
+  serverOnly: 0
+  visible: 0
+  m_AssetId: 
+  hasSpawned: 0
 --- !u!1 &750491124
 GameObject:
   m_ObjectHideFlags: 0
