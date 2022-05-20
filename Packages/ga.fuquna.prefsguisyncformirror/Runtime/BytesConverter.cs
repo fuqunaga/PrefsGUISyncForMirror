@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using Mirror;
+using UnityEngine;
 
 namespace PrefsGUI.Sync
 {
@@ -34,7 +35,15 @@ namespace PrefsGUI.Sync
         private static void _ObjToBytes<T>(object obj, ref byte[] bytes)
         {
             using var writer = NetworkWriterPool.Get();
-            writer.Write((T)obj);
+            if (Writer<T>.write != null)
+            {
+                writer.Write((T)obj);
+            }
+            else
+            {
+                var str = JsonUtility.ToJson(obj);
+                writer.Write(str);
+            }
 
             var seg = writer.ToArraySegment();
             if (bytes != null && bytes.Length == seg.Count)
@@ -74,7 +83,15 @@ namespace PrefsGUI.Sync
         private static T _BytesToObj<T>(byte[] bytes)
         {
             using var reader = NetworkReaderPool.Get(bytes);
-            return reader.Read<T>();
+            if (Reader<T>.read != null)
+            {
+                return reader.Read<T>();
+            }
+            else
+            {
+                var str = reader.Read<string>();
+                return JsonUtility.FromJson<T>(str);
+            }
         }
         
         #endregion
