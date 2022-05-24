@@ -4,7 +4,6 @@ using Mirror;
 using PrefsGUI.RosettaUI;
 using RosettaUI;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace PrefsGUI.Sync.Example
 {
@@ -14,15 +13,13 @@ namespace PrefsGUI.Sync.Example
         public Vector2 windowPosition;
         
         public int count;
-        [FormerlySerializedAs("updateValue")] public bool updatePrefsValues;
+        [SyncVar]public bool updatePrefsValues;
+        [SyncVar]public int showPrefsIndex;
         public List<PrefsFloat> prefsFloats;
-
-        public int showPrefsIndex;
-
+        
         public void Start()
         {
             ResetPrefs();
-            
             uiRoot.Build(CreateElement());
         }
 
@@ -48,22 +45,20 @@ namespace PrefsGUI.Sync.Example
         {
             return UI.Window(nameof(PerformanceTest),
                 UI.Field(() => count).RegisterValueChangeCallback(ResetPrefs),
-                UI.Field(() => updatePrefsValues),
+                UI.Field(() => updatePrefsValues, b => updatePrefsValues = b),
                 UI.DynamicElementOnStatusChanged(
                     () => count,
-                    max => UI.Slider(() => showPrefsIndex, max-1).RegisterValueChangeCallback(() => OnShowPrefsIndexChanged(showPrefsIndex))
+                    max => UI.Slider(
+                        () => showPrefsIndex,
+                        i => showPrefsIndex = i,
+                        max - 1
+                        )
                 ),
                 UI.DynamicElementOnStatusChanged(
                     () => showPrefsIndex,
                     (idx) =>  (0<=idx && idx <prefsFloats.Count) ? prefsFloats[idx].CreateElement() : null
                     )
             ).SetPosition(windowPosition);
-        }
-
-        [ClientRpc]
-        private void OnShowPrefsIndexChanged(int index)
-        {
-            showPrefsIndex = index;
         }
     }
 }
