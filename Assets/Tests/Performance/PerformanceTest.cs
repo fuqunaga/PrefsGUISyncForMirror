@@ -16,6 +16,9 @@ namespace PrefsGUI.Sync.Example
         [SyncVar]public bool updatePrefsValues;
         [SyncVar]public int showPrefsIndex;
         public List<PrefsFloat> prefsFloats;
+        public List<PrefsString> prefsStrings;
+
+        private static List<string> _stringValues = new();
         
         public void Start()
         {
@@ -31,6 +34,12 @@ namespace PrefsGUI.Sync.Example
                 {
                     prefs.Set(Random.value);
                 }
+                
+                foreach (var prefs in prefsStrings)
+                {
+                    prefs.Set(_stringValues[Random.Range(0,count)]);
+                }
+
             }
         }
 
@@ -39,6 +48,15 @@ namespace PrefsGUI.Sync.Example
             prefsFloats = Enumerable.Range(0, count)
                 .Select(i => new PrefsFloat(nameof(PrefsFloat) + i))
                 .ToList();
+            
+            prefsStrings = Enumerable.Range(0, count)
+                .Select(i => new PrefsString(nameof(PrefsString) + i))
+                .ToList();
+
+            if (_stringValues.Count <= count)
+            {
+                _stringValues = Enumerable.Range(0, count).Select(i => i.ToString()).ToList();
+            }
         }
 
         public Element CreateElement()
@@ -56,8 +74,18 @@ namespace PrefsGUI.Sync.Example
                 ),
                 UI.DynamicElementOnStatusChanged(
                     () => showPrefsIndex,
-                    (idx) =>  (0<=idx && idx <prefsFloats.Count) ? prefsFloats[idx].CreateElement() : null
-                    )
+                    (idx) =>
+                    {
+                        if (0 <= idx && idx < prefsFloats.Count)
+                        {
+                            return UI.Column(
+                                prefsFloats[idx].CreateElement(),
+                                prefsStrings[idx].CreateElement()
+                            );
+                        }
+
+                        return null;
+                    })
             ).SetPosition(windowPosition);
         }
     }

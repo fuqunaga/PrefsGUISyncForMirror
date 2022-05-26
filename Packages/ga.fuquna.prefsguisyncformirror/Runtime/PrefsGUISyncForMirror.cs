@@ -141,8 +141,6 @@ namespace PrefsGUI.Sync
             MaterialPropertyDebugMenu.update = materialPropertyDebugMenuUpdate;
         }
 
-
-        
         
         private readonly Dictionary<Type, SetToPrefsFunc> _setToPrefsFuncTable = new();
 
