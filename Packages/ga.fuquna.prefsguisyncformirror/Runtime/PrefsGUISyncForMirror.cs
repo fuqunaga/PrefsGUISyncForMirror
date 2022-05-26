@@ -117,11 +117,6 @@ namespace PrefsGUI.Sync
         [ClientCallback]
         void ReadPrefs(bool checkAlreadyGet = false)
         {
-            var alreadyGet = false;
-            var alreadyGetFunc = checkAlreadyGet
-                ? () => alreadyGet = true
-                : (Action) null;
-
             var allDic = PrefsParam.allDic;
 
             using var _ = ListPool<string>.Get(out var removeKeys);
@@ -132,12 +127,11 @@ namespace PrefsGUI.Sync
                 removeKeys.Add(key);
 
                 var bytes = _syncDictionary[key];
-                WriteBytesToPrefs(bytes, prefs);
+                var valueChangedAndAlreadyGet = WriteBytesToPrefs(bytes, prefs);
                 
-                if (alreadyGet)
+                if (checkAlreadyGet && valueChangedAndAlreadyGet)
                 {
-                    // Debug.LogWarning(
-                    //     $"key:[{prefs.key}] Get() before synced. before:[{prefs.GetInner()}] sync:[{obj}]");
+                    Debug.LogWarning($"key:[{prefs.key}] Prefs.Get() called before sync. Application may be using pre-sync values.");
                 }
             }
             
@@ -148,30 +142,37 @@ namespace PrefsGUI.Sync
         }
 
 
-        private readonly Dictionary<Type, Action<byte[], PrefsParam>> _toPrefsTable = new();
+        
+        
+        private readonly Dictionary<Type, SetToPrefsFunc> _setToPrefsFuncTable = new();
 
         private readonly MethodInfo _createToPrefsActionMethodInfo =
-            typeof(PrefsGUISyncForMirror).GetMethod(nameof(CreateToPrefsAction),
+            typeof(PrefsGUISyncForMirror).GetMethod(nameof(CreateSetToPrefsFunc),
                 BindingFlags.NonPublic | BindingFlags.Static);
 
-        void WriteBytesToPrefs(byte[] bytes, PrefsParam prefs)
+        bool WriteBytesToPrefs(byte[] bytes, PrefsParam prefs)
         {
             var innerType = prefs.GetInnerType();
-            if (!_toPrefsTable.TryGetValue(innerType, out var action))
+            if (!_setToPrefsFuncTable.TryGetValue(innerType, out var func))
             {
-                action = (Action<byte[], PrefsParam>)_createToPrefsActionMethodInfo.MakeGenericMethod(innerType).Invoke(null, null);
-                _toPrefsTable[innerType] = action;
+                func = (SetToPrefsFunc)_createToPrefsActionMethodInfo.MakeGenericMethod(innerType).Invoke(null, null);
+                _setToPrefsFuncTable[innerType] = func;
             }
 
-            action(bytes, prefs);
+            return func(bytes, prefs);
         }
 
-        static Action<byte[], PrefsParam> CreateToPrefsAction<T>()
+        // return Already Get()'d and value update 
+        delegate bool SetToPrefsFunc(byte[] bytes, PrefsParam prefs);
+        static SetToPrefsFunc CreateSetToPrefsFunc<T>()
         {
             return (bytes, prefs) =>
             {
                 var value = BytesConverter.BytesToValue<T>(bytes);
-                prefs.GetInnerAccessor<T>().SetSyncedValue(value);
+                var innerAccessor = prefs.GetInnerAccessor<T>();
+                
+                var alreadyGet = innerAccessor.IsAlreadyGet;
+                return alreadyGet && innerAccessor.SetSyncedValue(value);
             };
         }
     }
