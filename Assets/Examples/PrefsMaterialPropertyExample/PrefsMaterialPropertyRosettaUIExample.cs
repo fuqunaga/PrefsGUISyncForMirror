@@ -5,9 +5,10 @@ using UnityEngine;
 namespace PrefsGUI.Example
 {
     [RequireComponent(typeof(RosettaUIRoot))]
-    public class MaterialPropertyDebugMenuRosettaUIExample : MonoBehaviour
+    public class PrefsMaterialPropertyRosettaUIExample : MonoBehaviour
     {
-        public MaterialPropertyDebugMenu debugMenu;
+        public PrefsMaterialProperty prefsMaterialProperty;
+        public Vector2 position;
         
         public void Start()
         {
@@ -15,8 +16,8 @@ namespace PrefsGUI.Example
             
             rosettaUIRoot.Build(
                 UI.Window(
-                    debugMenu.CreateElement()
-                )
+                    prefsMaterialProperty.CreateElement()
+                ).SetPosition(position)
             );
         }
     }
