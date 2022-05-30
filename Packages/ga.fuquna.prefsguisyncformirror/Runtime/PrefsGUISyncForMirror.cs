@@ -19,9 +19,7 @@ namespace PrefsGUI.Sync
         private readonly SyncDictionary<string, byte[]> _syncDictionary = new();
         private HashSet<string> _receivedKey;
 
-
-        [SyncVar] bool materialPropertyDebugMenuUpdate;
-
+        
         #region Unity
         
         public void Awake()
@@ -81,11 +79,6 @@ namespace PrefsGUI.Sync
 
                 WritePrefsToSyncDictionary(prefs);
             }
-
-            if (materialPropertyDebugMenuUpdate != MaterialPropertyDebugMenu.update)
-            {
-                materialPropertyDebugMenuUpdate = MaterialPropertyDebugMenu.update;
-            }
         }
 
         private readonly Dictionary<Type, Action<PrefsParam>> _toDictionaryTable = new();
@@ -136,9 +129,6 @@ namespace PrefsGUI.Sync
             }
             
             _receivedKey.ExceptWith(removeKeys);
-            
-
-            MaterialPropertyDebugMenu.update = materialPropertyDebugMenuUpdate;
         }
 
         
