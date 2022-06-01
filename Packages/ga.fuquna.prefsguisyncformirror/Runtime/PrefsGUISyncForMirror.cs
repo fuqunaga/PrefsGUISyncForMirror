@@ -110,6 +110,8 @@ namespace PrefsGUI.Sync
         [ClientCallback]
         void ReadPrefs(bool checkAlreadyGet = false)
         {
+            if ( _receivedKey == null) return;
+            
             var allDic = PrefsParam.allDic;
 
             using var _ = ListPool<string>.Get(out var removeKeys);
