@@ -1,13 +1,25 @@
 ﻿using System.Net;
-using PrefsGUI.RapidGUI;
-using PrefsGUI.RosettaUI;
-using RapidGUI;
-using RosettaUI;
 using UnityEngine;
+
+#if PrefsGUI_RapidGUI
+using RapidGUI;
+using PrefsGUI.RapidGUI;
+#endif
+
+#if PrefsGUI_RosettaUI
+using RosettaUI;
+using PrefsGUI.RosettaUI;
+#endif
 
 namespace PrefsGUI.Example
 {
-    public class PrefsGUIExample_Part2 : MonoBehaviour, IDoGUI, IElementCreator
+    public class PrefsGUIExample_Part2 : MonoBehaviour
+#if PrefsGUI_RapidGUI
+        ,IDoGUI
+#endif
+#if PrefsGUI_RosettaUI
+        ,IElementCreator
+#endif
     {
         // define PrefsParams with key.
         public PrefsVector2Int prefsVector2Int = new PrefsVector2Int("PrefsVector2Int");
@@ -16,38 +28,7 @@ namespace PrefsGUI.Example
         public PrefsBounds prefsBounds = new PrefsBounds("PrefsBounds");
         public PrefsBoundsInt prefsBoundsInt = new PrefsBoundsInt("PrefsBoundsInt");
         public PrefsIPEndPoint prefsIPEndPoint = new PrefsIPEndPoint("PrefsIPEndPoint");
-
-        public void DoGUI()
-        {
-            prefsVector2Int.DoGUI();
-            prefsVector2Int.DoGUISlider();
-            prefsVector3Int.DoGUI();
-            prefsVector3Int.DoGUISlider();
-            prefsRect.DoGUI();
-            prefsRect.DoGUISlider();
-            prefsBounds.DoGUI();
-            prefsBounds.DoGUISlider();
-            prefsBoundsInt.DoGUI();
-            prefsBoundsInt.DoGUISlider();
-            prefsIPEndPoint.DoGUI();
-        }
-
-        public Element CreateElement(LabelElement _)
-        {
-            return UI.Column(
-                prefsVector2Int.CreateElement(),
-                prefsVector2Int.CreateSlider(),
-                prefsVector3Int.CreateElement(),
-                prefsVector3Int.CreateSlider(),
-                prefsRect.CreateElement(),
-                prefsRect.CreateSlider(),
-                prefsBounds.CreateElement(),
-                prefsBounds.CreateSlider(),
-                prefsBoundsInt.CreateElement(),
-                prefsIPEndPoint.CreateElement()
-            );
-        }
-
+        
         void Update()
         {
             TestImplicitCast();
@@ -63,5 +44,40 @@ namespace PrefsGUI.Example
 
             IPEndPoint ip = prefsIPEndPoint;
         }
+        
+#if PrefsGUI_RapidGUI
+        public void DoGUI()
+        {
+            prefsVector2Int.DoGUI();
+            prefsVector2Int.DoGUISlider();
+            prefsVector3Int.DoGUI();
+            prefsVector3Int.DoGUISlider();
+            prefsRect.DoGUI();
+            prefsRect.DoGUISlider();
+            prefsBounds.DoGUI();
+            prefsBounds.DoGUISlider();
+            prefsBoundsInt.DoGUI();
+            prefsBoundsInt.DoGUISlider();
+            prefsIPEndPoint.DoGUI();
+        }
+#endif
+
+#if PrefsGUI_RosettaUI
+        public Element CreateElement(LabelElement _)
+        {
+            return UI.Column(
+                prefsVector2Int.CreateElement(),
+                prefsVector2Int.CreateSlider(),
+                prefsVector3Int.CreateElement(),
+                prefsVector3Int.CreateSlider(),
+                prefsRect.CreateElement(),
+                prefsRect.CreateSlider(),
+                prefsBounds.CreateElement(),
+                prefsBounds.CreateSlider(),
+                prefsBoundsInt.CreateElement(),
+                prefsIPEndPoint.CreateElement()
+            );
+        }
+#endif
     }
 }

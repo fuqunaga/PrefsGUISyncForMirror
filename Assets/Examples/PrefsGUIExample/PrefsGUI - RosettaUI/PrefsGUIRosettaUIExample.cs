@@ -1,9 +1,12 @@
 using PrefsGUI.Example;
-using RosettaUI;
 using UnityEngine;
+#if PrefsGUI_RosettaUI
+using RosettaUI;
+#endif
 
 namespace PrefsGUI.RosettaUI.Example
 {
+#if PrefsGUI_RosettaUI
     [RequireComponent(typeof(RosettaUIRoot))]
     public class PrefsGUIRosettaUIExample : MonoBehaviour
     {
@@ -30,4 +33,8 @@ namespace PrefsGUI.RosettaUI.Example
             ).SetPosition(position);
         }
     }
+#else
+    public class PrefsGUIRosettaUIExample : MonoBehaviour
+    {}
+#endif
 }

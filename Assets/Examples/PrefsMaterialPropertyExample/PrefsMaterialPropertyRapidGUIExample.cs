@@ -1,8 +1,12 @@
-﻿using PrefsGUI.RapidGUI;
+﻿using UnityEngine;
+#if PrefsGUI_RapidGUI
+using PrefsGUI.RapidGUI;
 using UnityEngine.Serialization;
+#endif
 
 namespace PrefsGUI.Example
 {
+#if PrefsGUI_RapidGUI
     public class PrefsMaterialPropertyRapidGUIExample : PrefsGUIRapidGUIExampleBase
     {
         [FormerlySerializedAs("debugMenu")] public PrefsMaterialProperty prefsMaterialProperty;
@@ -25,4 +29,8 @@ namespace PrefsGUI.Example
             base.DoGUI();
         }
     }
+#else
+    public class PrefsMaterialPropertyRapidGUIExample : MonoBehaviour
+    {}
+#endif
 }

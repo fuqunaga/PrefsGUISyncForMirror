@@ -305,7 +305,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7849735203262328167, guid: 22d0f1c0bb64c6941ae1d584d298c577, type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7849735203262328167, guid: 22d0f1c0bb64c6941ae1d584d298c577, type: 3}
       propertyPath: m_LocalPosition.x
@@ -620,7 +620,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2073270505
 GameObject:
@@ -638,7 +638,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2073270506
 Transform:
   m_ObjectHideFlags: 0
@@ -652,7 +652,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2073270507
 MonoBehaviour:
@@ -679,8 +679,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1408913456}
     - target: {fileID: 1339723815, guid: ae7b067c7f22561448b2762e67a3d793, type: 3}
+      propertyPath: position.x
+      value: 800
+      objectReference: {fileID: 0}
+    - target: {fileID: 1339723815, guid: ae7b067c7f22561448b2762e67a3d793, type: 3}
       propertyPath: position.y
-      value: 150
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1339723815, guid: ae7b067c7f22561448b2762e67a3d793, type: 3}
       propertyPath: prefsMaterialProperty
@@ -692,7 +696,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6243543152550526293, guid: ae7b067c7f22561448b2762e67a3d793, type: 3}
       propertyPath: m_RootOrder
-      value: 7
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 6243543152550526293, guid: ae7b067c7f22561448b2762e67a3d793, type: 3}
       propertyPath: m_LocalPosition.x

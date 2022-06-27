@@ -1,0 +1,33 @@
+{
+    "name": "PrefsGUISyncForMirror.Example",
+    "rootNamespace": "",
+    "references": [
+        "GUID:7b68978d0ba23bf419a515a760f2be88",
+        "GUID:436548315e6ca5b499a1008921425bfb",
+        "GUID:9160181cbc72aab4b869710b61b8f148",
+        "GUID:2b1b0416520827b409049c7e4d90bcc1",
+        "GUID:4d1159afe4006d44595a6424bec07c77",
+        "GUID:3d35d6db7bb67824691179b12a2ce031",
+        "GUID:8dde17fe02b3f1f46a868d4bdceedfc0"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "ga.fuquna.prefsgui.rosettaui",
+            "expression": "",
+            "define": "PrefsGUI_RosettaUI"
+        },
+        {
+            "name": "ga.fuquna.prefsgui.rapidgui",
+            "expression": "",
+            "define": "PrefsGUI_RapidGUI"
+        }
+    ],
+    "noEngineReferences": false
+}

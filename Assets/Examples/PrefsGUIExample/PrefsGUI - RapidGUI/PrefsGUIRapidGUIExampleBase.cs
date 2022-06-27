@@ -1,5 +1,7 @@
-﻿using RapidGUI;
-using UnityEngine;
+﻿using UnityEngine;
+
+#if PrefsGUI_RapidGUI
+using RapidGUI;
 
 namespace PrefsGUI.Example
 {
@@ -31,3 +33,4 @@ namespace PrefsGUI.Example
         }
     }
 }
+#endif

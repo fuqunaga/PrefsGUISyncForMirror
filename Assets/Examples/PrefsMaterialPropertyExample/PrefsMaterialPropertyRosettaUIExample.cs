@@ -1,9 +1,13 @@
-﻿using PrefsGUI.RosettaUI;
+﻿using UnityEngine;
+
+#if PrefsGUI_RosettaUI
 using RosettaUI;
-using UnityEngine;
+using PrefsGUI.RosettaUI;
+#endif
 
 namespace PrefsGUI.Example
 {
+#if PrefsGUI_RosettaUI
     [RequireComponent(typeof(RosettaUIRoot))]
     public class PrefsMaterialPropertyRosettaUIExample : MonoBehaviour
     {
@@ -21,4 +25,9 @@ namespace PrefsGUI.Example
             );
         }
     }
+#else
+    public class PrefsMaterialPropertyRosettaUIExample : MonoBehaviour
+    {
+    }
+#endif
 }

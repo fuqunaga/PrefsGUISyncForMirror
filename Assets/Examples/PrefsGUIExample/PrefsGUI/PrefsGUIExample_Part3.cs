@@ -1,12 +1,23 @@
-﻿using PrefsGUI.RapidGUI;
-using PrefsGUI.RosettaUI;
+﻿using UnityEngine;
+#if PrefsGUI_RapidGUI
 using RapidGUI;
+using PrefsGUI.RapidGUI;
+#endif
+
+#if PrefsGUI_RosettaUI
 using RosettaUI;
-using UnityEngine;
+using PrefsGUI.RosettaUI;
+#endif
 
 namespace PrefsGUI.Example
 {
-    public class PrefsGUIExample_Part3 : MonoBehaviour, IDoGUI, IElementCreator
+    public class PrefsGUIExample_Part3 : MonoBehaviour
+#if PrefsGUI_RapidGUI
+        ,IDoGUI 
+#endif
+#if PrefsGUI_RosettaUI
+        ,IElementCreator
+#endif
     {
         // define PrefsParams with key.
         public PrefsMinMaxInt prefsMinMaxInt = new("PrefsMinMaxInt");
@@ -17,6 +28,7 @@ namespace PrefsGUI.Example
         public PrefsMinMaxVector2Int prefsMinMaxVector2Int = new("PrefsMinMaxVector2Int");
         public PrefsMinMaxVector3Int prefsMinMaxVector3Int = new("PrefsMinMaxVector3Int");
 
+#if PrefsGUI_RapidGUI
         public void DoGUI()
         {
             prefsMinMaxInt.DoGUISlider();
@@ -27,7 +39,9 @@ namespace PrefsGUI.Example
             prefsMinMaxVector2Int.DoGUISlider();
             prefsMinMaxVector3Int.DoGUISlider();
         }
+#endif
 
+#if PrefsGUI_RosettaUI
         public Element CreateElement(LabelElement _)
         {
             return UI.Column(
@@ -40,5 +54,6 @@ namespace PrefsGUI.Example
                 prefsMinMaxVector3Int.CreateMinMaxSlider()
             );
         }
+#endif
     }
 }

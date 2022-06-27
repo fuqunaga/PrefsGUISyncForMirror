@@ -1,9 +1,13 @@
-﻿using PrefsGUI.RapidGUI;
+﻿using UnityEngine;
+
+#if PrefsGUI_RapidGUI
 using RapidGUI;
-using UnityEngine;
+using PrefsGUI.RapidGUI;
+#endif
 
 namespace PrefsGUI.Example
 {
+#if PrefsGUI_RapidGUI
     public class PrefsGUIRapidGUIExample : PrefsGUIRapidGUIExampleBase
     {
         public Vector2 position;
@@ -29,4 +33,8 @@ namespace PrefsGUI.Example
             base.DoGUI();
         }
     }
+#else
+    public class PrefsGUIRapidGUIExample : MonoBehaviour
+    {}
+#endif
 }

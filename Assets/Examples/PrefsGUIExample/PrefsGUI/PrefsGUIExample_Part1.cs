@@ -1,14 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using PrefsGUI.RapidGUI;
-using PrefsGUI.RosettaUI;
-using RapidGUI;
-using RosettaUI;
+using System.Diagnostics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
+
+#if PrefsGUI_RapidGUI
+using RapidGUI;
+using PrefsGUI.RapidGUI;
+#endif
+
+#if PrefsGUI_RosettaUI
+using RosettaUI;
+using PrefsGUI.RosettaUI;
+#endif
 
 namespace PrefsGUI.Example
 {
-    public class PrefsGUIExample_Part1 : MonoBehaviour, IDoGUI, IElementCreator
+    public class PrefsGUIExample_Part1 : MonoBehaviour
+#if PrefsGUI_RapidGUI
+        ,IDoGUI 
+#endif
+#if PrefsGUI_RosettaUI
+        ,IElementCreator
+#endif
     {
         #region Type Define
 
@@ -51,6 +65,35 @@ namespace PrefsGUI.Example
         public PrefsAny<CustomClass> prefsClass = new PrefsAny<CustomClass>("PrefsClass");
         public PrefsList<CustomClass> prefsList = new PrefsList<CustomClass>("PrefsList");
 
+        
+        void Update()
+        {
+            TestImplicitCast();
+        }
+
+        protected void TestImplicitCast()
+        {
+            bool b = prefsBool;
+            int i = prefsInt;
+            float f = prefsFloat;
+            string s = prefsString;
+            EnumSample e = prefsEnum;
+            Color c = prefsColor;
+            Vector2 v2 = prefsVector2;
+            Vector3 v3 = prefsVector2;
+            Vector4 v4 = prefsVector2;
+            v2 = prefsVector3;
+            v3 = prefsVector3;
+            v4 = prefsVector3;
+            v2 = prefsVector4;
+            v3 = prefsVector4;
+            v4 = prefsVector4;
+
+            CustomClass customClass = prefsClass;
+            List<CustomClass> list = prefsList;
+        }
+        
+#if PrefsGUI_RapidGUI
         public void DoGUI()
         {
             prefsBool.DoGUI();
@@ -83,34 +126,9 @@ namespace PrefsGUI.Example
                 prefsList.DoGUIAt(0, "PrefsList element at 0");
             }
         }
+#endif
 
-        void Update()
-        {
-            TestImplicitCast();
-        }
-
-        protected void TestImplicitCast()
-        {
-            bool b = prefsBool;
-            int i = prefsInt;
-            float f = prefsFloat;
-            string s = prefsString;
-            EnumSample e = prefsEnum;
-            Color c = prefsColor;
-            Vector2 v2 = prefsVector2;
-            Vector3 v3 = prefsVector2;
-            Vector4 v4 = prefsVector2;
-            v2 = prefsVector3;
-            v3 = prefsVector3;
-            v4 = prefsVector3;
-            v2 = prefsVector4;
-            v3 = prefsVector4;
-            v4 = prefsVector4;
-
-            CustomClass customClass = prefsClass;
-            List<CustomClass> list = prefsList;
-        }
-
+#if PrefsGUI_RosettaUI
         public Element CreateElement(LabelElement _)
         {
             return UI.Column(
@@ -131,5 +149,6 @@ namespace PrefsGUI.Example
                 prefsList.CreateElement()
             );
         }
+#endif
     }
 }

@@ -1,3 +1,5 @@
+#if PrefsGUI_RosettaUI
+
 using System.Collections.Generic;
 using System.Linq;
 using Mirror;
@@ -90,3 +92,5 @@ namespace PrefsGUI.Sync.Example
         }
     }
 }
+
+#endif
