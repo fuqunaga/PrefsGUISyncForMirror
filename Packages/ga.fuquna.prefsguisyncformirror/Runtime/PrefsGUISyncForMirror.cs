@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Mirror;
 using UnityEngine;
 using UnityEngine.Pool;
+using UnityEngine.Serialization;
 
 namespace PrefsGUI.Sync
 {
@@ -11,13 +13,20 @@ namespace PrefsGUI.Sync
     /// Sync PrefsGUI parameter over UNET
     /// </summary>
     [DefaultExecutionOrder(-1)]
-    public class PrefsGUISyncForMirror : NetworkBehaviour
+    public class PrefsGUISyncForMirror : NetworkBehaviour, ISerializationCallbackReceiver
     {
         // want use HashSet but use List so it will be serialized on Inspector
-        public List<string> ignoreKeys = new();
+        [SerializeField]
+        [FormerlySerializedAs("ignoreKeys")]
+        private List<string> ignoreKeyList = new();
+
+        private HashSet<string> _ignoreKeys;
 
         private readonly SyncDictionary<string, byte[]> _syncDictionary = new();
         private HashSet<string> _receivedKey;
+        
+        
+        public IEnumerable<string> IgnoreKeys => ignoreKeyList;
 
         
         #region Unity
@@ -65,17 +74,47 @@ namespace PrefsGUI.Sync
                 ReadPrefs();
             }
         }
+
+        public void OnBeforeSerialize()
+        {
+        }
+
+        public void OnAfterDeserialize()
+        {
+            _ignoreKeys = new(ignoreKeyList);
+        }
         
         #endregion
         
+        
+        #region IgnoreKey
 
+        public bool HasIgnoreKey(string key) => _ignoreKeys.Contains(key);
+
+        public void AddIgnoreKey(string key)
+        {
+            ignoreKeyList.Add(key);
+            _ignoreKeys.Add(key);
+        }
+
+        public void RemoveIgnoreKey(string key)
+        {
+            ignoreKeyList.RemoveAll(k => k == key);
+            _ignoreKeys.Remove(key);
+        }
+
+        #endregion
+        
+
+        #region Server
+        
         [ServerCallback]
         void SendPrefs()
         {
             foreach (var prefs in PrefsParam.all)
             {
                 var key = prefs.key;
-                if (ignoreKeys.Contains(key)) continue;
+                if (HasIgnoreKey(key)) continue;
 
                 WritePrefsToSyncDictionary(prefs);
             }
@@ -105,7 +144,10 @@ namespace PrefsGUI.Sync
             return (prefs) => toByteDictionary.WriteFrom(prefs.GetInnerAccessor<T>());
         }
         
-        
+        #endregion
+
+
+        #region Client
 
         [ClientCallback]
         void ReadPrefs(bool checkAlreadyGet = false)
@@ -165,5 +207,7 @@ namespace PrefsGUI.Sync
                 return alreadyGet && innerAccessor.SetSyncedValue(value);
             };
         }
+
+        #endregion
     }
 }

@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0
-  ignoreKeys: []
+  ignoreKeyList: []
 --- !u!114 &4002032992138290990
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63,5 +63,5 @@ MonoBehaviour:
   sceneId: 0
   serverOnly: 0
   visible: 0
-  m_AssetId: 
+  m_AssetId: b505519b5e6839c448e69ec00ddb3f93
   hasSpawned: 0

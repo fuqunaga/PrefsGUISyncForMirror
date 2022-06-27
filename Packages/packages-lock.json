@@ -154,31 +154,28 @@
       "hash": "f45424822189ebd875d864a17d7f03b72eafbff7"
     },
     "ga.fuquna.prefsgui": {
-      "version": "3.1.0",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://registry.npmjs.com"
+      "version": "file:C:/unity/PrefsGUI/Packages/PrefsGUI",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
     },
     "ga.fuquna.prefsgui.rapidgui": {
-      "version": "0.0.1",
+      "version": "file:C:/unity/PrefsGUI/Packages/PrefsGUI.RapidGUI",
       "depth": 0,
-      "source": "registry",
+      "source": "local",
       "dependencies": {
         "ga.fuquna.prefsgui": "3.1.0",
         "ga.fuquna.rapidgui": "1.2.3"
-      },
-      "url": "https://registry.npmjs.com"
+      }
     },
     "ga.fuquna.prefsgui.rosettaui": {
-      "version": "0.0.3",
+      "version": "file:C:/unity/PrefsGUI/Packages/PrefsGUI.RosettaUI",
       "depth": 0,
-      "source": "registry",
+      "source": "local",
       "dependencies": {
         "ga.fuquna.prefsgui": "3.1.0",
         "ga.fuquna.rosettaui": "0.3.2"
-      },
-      "url": "https://registry.npmjs.com"
+      }
     },
     "ga.fuquna.prefsguisyncformirror": {
       "version": "file:ga.fuquna.prefsguisyncformirror",
@@ -196,20 +193,18 @@
       "url": "https://registry.npmjs.com"
     },
     "ga.fuquna.rosettaui": {
-      "version": "0.3.2",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://registry.npmjs.com"
+      "version": "file:C:/unity/RosettaUI/Packages/RosettaUI",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
     },
     "ga.fuquna.rosettaui.uitoolkit": {
-      "version": "0.0.8",
+      "version": "file:C:/unity/RosettaUI/Packages/RosettaUI.UIToolkit",
       "depth": 0,
-      "source": "registry",
+      "source": "local",
       "dependencies": {
-        "ga.fuquna.rosettaui": "0.3.2"
-      },
-      "url": "https://registry.npmjs.com"
+        "ga.fuquna.rosettaui": "0.4.0"
+      }
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",
