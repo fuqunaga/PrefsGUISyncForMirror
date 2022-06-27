@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#if PrefsGUI_RapidGUI
+
+using System.Collections.Generic;
 using System.Linq;
 using PrefsGUI.RapidGUI.Editor;
 using RapidGUI;
@@ -8,40 +10,40 @@ using UnityEngine;
 namespace PrefsGUI.Sync.Editor
 {
     [InitializeOnLoad]
-    public class PrefsGUISyncEditor : IPrefsGUIEditorExtension
+    public class PrefsGUISyncEditor : IPrefsGUIEditorRapidGUIExtension
     {
         #region static
 
         static PrefsGUISyncEditor()
         {
             var instance = new PrefsGUISyncEditor();
-            PrefsGUIEditor.RegistExtension(instance);
+            PrefsGUIEditorRapidGUI.RegisterExtension(instance);
         }
 
         #endregion
 
 
-        private PrefsGUISyncForMirror sync;
+        private PrefsGUISyncForMirror _sync;
 
 
         public void GUIHeadLine()
         {
-            sync = Object.FindObjectOfType<PrefsGUISyncForMirror>();
-            if (sync != null) GUILayout.Label("Sync");
+            _sync = Object.FindObjectOfType<PrefsGUISyncForMirror>();
+            if (_sync != null) GUILayout.Label("Sync");
         }
 
         public void GUIPrefsLeft(PrefsParam prefs)
         {
-            SyncToggle(sync, prefs);
+            SyncToggle(_sync, prefs);
         }
 
         public void GUIGroupLabelLeft(IEnumerable<PrefsParam> prefsList)
         {
-            SyncToggleList(sync, prefsList);
+            SyncToggleList(_sync, prefsList);
         }
 
 
-        void SyncToggle(PrefsGUISyncForMirror sync, PrefsParam prefs)
+        static void SyncToggle(PrefsGUISyncForMirror sync, PrefsParam prefs)
         {
             if (sync != null)
             {
@@ -50,7 +52,7 @@ namespace PrefsGUI.Sync.Editor
                     var key = prefs.key;
                     var isSync = !sync.ignoreKeys.Contains(key);
 
-                    if (isSync != GUILayout.Toggle(isSync, GUIContent.none, PrefsGUIEditorBase.ToggleWidth))
+                    if (isSync != GUILayout.Toggle(isSync, GUIContent.none, PrefsGUIEditorRapidGUIBase.ToggleWidth))
                     {
                         Undo.RecordObject(sync, "Change PrefsGUI sync flag");
                         EditorUtility.SetDirty(sync);
@@ -62,14 +64,14 @@ namespace PrefsGUI.Sync.Editor
             }
         }
 
-        void SyncToggleList(PrefsGUISyncForMirror sync, IEnumerable<PrefsParam> prefsList)
+        static void SyncToggleList(PrefsGUISyncForMirror sync, IEnumerable<PrefsParam> prefsList)
         {
             if (sync != null)
             {
                 var keys = prefsList.Select(p => p.key).ToList();
                 var syncKeys = keys.Except(sync.ignoreKeys);
 
-                var isSync = PrefsGUIEditorBase.ToggleMixed(syncKeys.Count(), keys.Count);
+                var isSync = PrefsGUIEditorRapidGUIBase.ToggleMixed(syncKeys.Count(), keys.Count);
                 if (isSync.HasValue)
                 {
                     Undo.RecordObject(sync, "Change PrefsGUIs sync flag");
@@ -91,3 +93,5 @@ namespace PrefsGUI.Sync.Editor
         }
     }
 }
+
+#endif
