@@ -22,15 +22,15 @@ namespace PrefsGUI.Sync.Editor
 
             public Element PrefsLeft(PrefsParam prefs)
             {
-                return UI.Field(null, 
+                return UI.Toggle(null,
                     () => PrefsGUISyncEditorUtility.GetSyncFlag(prefs.key),
                     flag => PrefsGUISyncEditorUtility.SetSyncFlag(prefs.key, flag)
-                    );
+                ).SetHeight(28f);
             }
 
             public Element PrefsSetLeft(IEnumerable<PrefsParam> prefsList)
             {
-                return UI.Field(null, 
+                return UI.Toggle(null, 
                     () => prefsList.Any(prefs => PrefsGUISyncEditorUtility.GetSyncFlag(prefs.key)),
                     flag => PrefsGUISyncEditorUtility.SetSyncFlags(prefsList.Select(prefs => prefs.key), flag)
                 );

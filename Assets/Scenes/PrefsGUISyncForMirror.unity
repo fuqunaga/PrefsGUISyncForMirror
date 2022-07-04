@@ -369,6 +369,54 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4002032992138290985, guid: b505519b5e6839c448e69ec00ddb3f93, type: 3}
+      propertyPath: ignoreKeyList.Array.size
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 4002032992138290985, guid: b505519b5e6839c448e69ec00ddb3f93, type: 3}
+      propertyPath: ignoreKeyList.Array.data[0]
+      value: PrefsEnum
+      objectReference: {fileID: 0}
+    - target: {fileID: 4002032992138290985, guid: b505519b5e6839c448e69ec00ddb3f93, type: 3}
+      propertyPath: ignoreKeyList.Array.data[1]
+      value: PrefsColor
+      objectReference: {fileID: 0}
+    - target: {fileID: 4002032992138290985, guid: b505519b5e6839c448e69ec00ddb3f93, type: 3}
+      propertyPath: ignoreKeyList.Array.data[2]
+      value: PrefsVector2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4002032992138290985, guid: b505519b5e6839c448e69ec00ddb3f93, type: 3}
+      propertyPath: ignoreKeyList.Array.data[3]
+      value: PrefsVector3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4002032992138290985, guid: b505519b5e6839c448e69ec00ddb3f93, type: 3}
+      propertyPath: ignoreKeyList.Array.data[4]
+      value: PrefsVector4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4002032992138290985, guid: b505519b5e6839c448e69ec00ddb3f93, type: 3}
+      propertyPath: ignoreKeyList.Array.data[5]
+      value: PrefsClass
+      objectReference: {fileID: 0}
+    - target: {fileID: 4002032992138290985, guid: b505519b5e6839c448e69ec00ddb3f93, type: 3}
+      propertyPath: ignoreKeyList.Array.data[6]
+      value: PrefsList
+      objectReference: {fileID: 0}
+    - target: {fileID: 4002032992138290985, guid: b505519b5e6839c448e69ec00ddb3f93, type: 3}
+      propertyPath: ignoreKeyList.Array.data[7]
+      value: PrefsFloat
+      objectReference: {fileID: 0}
+    - target: {fileID: 4002032992138290985, guid: b505519b5e6839c448e69ec00ddb3f93, type: 3}
+      propertyPath: ignoreKeyList.Array.data[8]
+      value: PrefsInt
+      objectReference: {fileID: 0}
+    - target: {fileID: 4002032992138290985, guid: b505519b5e6839c448e69ec00ddb3f93, type: 3}
+      propertyPath: ignoreKeyList.Array.data[9]
+      value: PrefsInt
+      objectReference: {fileID: 0}
+    - target: {fileID: 4002032992138290985, guid: b505519b5e6839c448e69ec00ddb3f93, type: 3}
+      propertyPath: ignoreKeyList.Array.data[10]
+      value: PrefsBool
+      objectReference: {fileID: 0}
     - target: {fileID: 4002032992138290986, guid: b505519b5e6839c448e69ec00ddb3f93, type: 3}
       propertyPath: m_Name
       value: PrefsGUISync
