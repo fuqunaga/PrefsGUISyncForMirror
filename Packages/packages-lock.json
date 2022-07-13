@@ -164,7 +164,7 @@
       "depth": 0,
       "source": "local",
       "dependencies": {
-        "ga.fuquna.prefsgui": "3.1.0",
+        "ga.fuquna.prefsgui": "3.2.0",
         "ga.fuquna.rapidgui": "1.2.3"
       }
     },
@@ -173,8 +173,8 @@
       "depth": 0,
       "source": "local",
       "dependencies": {
-        "ga.fuquna.prefsgui": "3.1.0",
-        "ga.fuquna.rosettaui": "0.3.2"
+        "ga.fuquna.prefsgui": "3.2.0",
+        "ga.fuquna.rosettaui.uitoolkit": "0.0.9"
       }
     },
     "ga.fuquna.prefsguisyncformirror": {
@@ -203,7 +203,7 @@
       "depth": 0,
       "source": "local",
       "dependencies": {
-        "ga.fuquna.rosettaui": "0.4.0"
+        "ga.fuquna.rosettaui": "0.4.1"
       }
     },
     "com.unity.modules.ai": {
