@@ -1,6 +1,10 @@
 # PrefsGUISync For Mirror
-Synchronization subset for [PrefsGUI](https://github.com/fuqunaga/PrefsGUI) over [Mirror](https://github.com/vis2k/Mirror)  
-  
+
+Synchronization subset for [PrefsGUI](https://github.com/fuqunaga/PrefsGUI) over [Mirror](https://github.com/vis2k/Mirror).
+
+![](Documentation~/prefsguisync.webp)
+
+
 # Installation
 ## Install Mirror
  - [Mirror via AssetStore](https://assetstore.unity.com/packages/tools/network/mirror-129321)
@@ -29,21 +33,21 @@ Select `PrefsGUISync For Mirror` and click the Install button
 
 
 # Usage
-![PrefsGUISyncObj](Documentation~/PrefsGUISyncObj.png)  
+<img src="Documentation~/2022-07-14-13-01-26.png" width="500px" />  
 
-Put **PrefsGUISyncForMirror** GameObject to the scene.  
-This inherits from [NetworkBehaivour](https://mirror-networking.gitbook.io/docs/components/networkbehaviour), so take steps to make it work(call `Spawn()` or put on the online scene).
-<br>
+Put `Packages/PrefsGUISync For Mirror/Runtime/PrefsGUISync.prefab` to the scene.  
+PrefsGUISyncForMirror component inherits from [NetworkBehaivour](https://mirror-networking.gitbook.io/docs/components/networkbehaviour), so take steps to make it work(call `Spawn()` or put it on the online scene).  
+  
 Now all prefs are automatically synchronized between the server and client!
 
-### ℹ️ No synchronization of specific prefs
-Disable sync toggle at the **EditorWindow**(See the section below).<br>
-or Set prefs's key to `PrefsGUISyncForMirror.ignoreKeys` at the inspector.
+## Skip synchronization of specified prefs
+Disable sync toggle at the **EditorWindow**(See the section below).  
+or set prefs's key to `PrefsGUISyncForMirror.ignoreKeyList`.
 
-# EditorWindow
-![EditorWindow](Documentation~/EditorWindow.png)
-- **Window -> PrefsGUI**
-- You can set whether to synchronize with the sync toggle
+### EditorWindow
+**Window > PrefsGUI**
+<img src="Documentation~/2022-07-14-13-14-41.png" width="800px">
+You can set whether to synchronize with the sync toggle.
 
 # Reference
 [PrefsGUI](https://github.com/fuqunaga/PrefsGUI) - Accessors and GUIs for persistent preference values using a JSON file
