@@ -19,6 +19,8 @@
     "email": "fukhid@gmail.com",
     "url": "https://fuquna.ga"
   },
+  "documentationUrl": "https://github.com/fuqunaga/PrefsGUISyncForMirror#readme",
+  "changelogUrl": "https://github.com/fuqunaga/PrefsGUISyncForMirror/blob/main/Packages/ga.fuquna.prefsguisyncformirror/CHANGELOG.md",
   "repository": "github:fuqunaga/PrefsGUISyncForMirror",
   "license": "MIT"
 }
