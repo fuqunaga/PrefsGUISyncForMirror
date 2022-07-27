@@ -50,4 +50,5 @@ or set prefs's key to `PrefsGUISyncForMirror.ignoreKeyList`.
 You can set whether to synchronize with the sync toggle.
 
 # Reference
-[PrefsGUI](https://github.com/fuqunaga/PrefsGUI) - Accessors and GUIs for persistent preference values using a JSON file
+- [UV Checker Map Maker](http://uvchecker.byvalle.com/)(CustomUVChecker_byValle_1K.png)
+- [PrefsGUI](https://github.com/fuqunaga/PrefsGUI) - Accessors and GUIs for persistent preference values using a JSON file
