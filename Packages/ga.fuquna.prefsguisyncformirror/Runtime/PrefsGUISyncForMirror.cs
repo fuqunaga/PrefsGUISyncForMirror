@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Mirror;
 using UnityEngine;
@@ -204,7 +203,9 @@ namespace PrefsGUI.Sync
                 var innerAccessor = prefs.GetInnerAccessor<T>();
                 
                 var alreadyGet = innerAccessor.IsAlreadyGet;
-                return alreadyGet && innerAccessor.SetSyncedValue(value);
+                var valueUpdated = innerAccessor.SetSyncedValue(value);
+
+                return alreadyGet && valueUpdated;
             };
         }
 
