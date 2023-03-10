@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/fuqunaga/PrefsGUISyncForMirror/compare/v1.0.2...v1.0.3) (2023-03-10)
+
+
+### Bug Fixes
+
+* **upgrade:** Mirror73 ([54787c9](https://github.com/fuqunaga/PrefsGUISyncForMirror/commit/54787c9b12ce843690e279d9ccc4f88f39d4b3a6))
+
 ## [1.0.2](https://github.com/fuqunaga/PrefsGUISyncForMirror/compare/v1.0.1...v1.0.2) (2022-08-26)
 
 
