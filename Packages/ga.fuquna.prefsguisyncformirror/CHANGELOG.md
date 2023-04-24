@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/fuqunaga/PrefsGUISyncForMirror/compare/v1.0.3...v1.0.4) (2023-04-24)
+
+
+### Bug Fixes
+
+* PrefsBounds/PrefsBoundsInt is not sync ([a082365](https://github.com/fuqunaga/PrefsGUISyncForMirror/commit/a0823658c5ff3c012ae451155b6303fa9dc9dc90))
+
 ## [1.0.3](https://github.com/fuqunaga/PrefsGUISyncForMirror/compare/v1.0.2...v1.0.3) (2023-03-10)
 
 
