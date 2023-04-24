@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace PrefsGUI.Sync
 {
-    public static class BytesConverter
+    public static partial class BytesConverter
     {
         public static void ValueToBytes<T>(T value, ref byte[] bytes)
         {
