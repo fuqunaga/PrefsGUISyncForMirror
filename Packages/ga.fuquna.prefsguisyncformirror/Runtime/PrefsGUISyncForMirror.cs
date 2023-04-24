@@ -108,7 +108,7 @@ namespace PrefsGUI.Sync
         #region Server
         
         [ServerCallback]
-        void SendPrefs()
+        private void SendPrefs()
         {
             foreach (var prefs in PrefsParam.all)
             {
@@ -125,7 +125,7 @@ namespace PrefsGUI.Sync
             typeof(PrefsGUISyncForMirror).GetMethod(nameof(CreateToDictionaryAction),
                 BindingFlags.Instance | BindingFlags.NonPublic);
 
-        void WritePrefsToSyncDictionary(PrefsParam prefs)
+        private void WritePrefsToSyncDictionary(PrefsParam prefs)
         {
             var innerType = prefs.GetInnerType();
             if (!_toDictionaryTable.TryGetValue(innerType, out var action))
@@ -137,7 +137,7 @@ namespace PrefsGUI.Sync
             action(prefs);
         }
 
-        Action<PrefsParam> CreateToDictionaryAction<T>()
+        private Action<PrefsParam> CreateToDictionaryAction<T>()
         {
             var toByteDictionary = new PrefsToByteDictionary<T>(_syncDictionary);
             return (prefs) => toByteDictionary.WriteFrom(prefs.GetInnerAccessor<T>());
@@ -149,7 +149,7 @@ namespace PrefsGUI.Sync
         #region Client
 
         [ClientCallback]
-        void ReadPrefs(bool checkAlreadyGet = false)
+        private void ReadPrefs(bool checkAlreadyGet = false)
         {
             if ( _receivedKey == null) return;
             
@@ -181,7 +181,7 @@ namespace PrefsGUI.Sync
             typeof(PrefsGUISyncForMirror).GetMethod(nameof(CreateSetToPrefsFunc),
                 BindingFlags.NonPublic | BindingFlags.Static);
 
-        bool WriteBytesToPrefs(byte[] bytes, PrefsParam prefs)
+        private bool WriteBytesToPrefs(byte[] bytes, PrefsParam prefs)
         {
             var innerType = prefs.GetInnerType();
             if (!_setToPrefsFuncTable.TryGetValue(innerType, out var func))
@@ -194,8 +194,9 @@ namespace PrefsGUI.Sync
         }
 
         // return Already Get()'d and value update 
-        delegate bool SetToPrefsFunc(byte[] bytes, PrefsParam prefs);
-        static SetToPrefsFunc CreateSetToPrefsFunc<T>()
+        private delegate bool SetToPrefsFunc(byte[] bytes, PrefsParam prefs);
+
+        private static SetToPrefsFunc CreateSetToPrefsFunc<T>()
         {
             return (bytes, prefs) =>
             {
