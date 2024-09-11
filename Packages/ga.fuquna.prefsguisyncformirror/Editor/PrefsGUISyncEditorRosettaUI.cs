@@ -13,7 +13,7 @@ namespace PrefsGUI.Sync.Editor
     {
         static PrefsGUISyncEditorRosettaUI()
         {
-            PrefsGUIEditorRosettaUI.RegisterObjCheckExtension(new PrefsGUIEditorRosettaUIObjCheckExtension());
+            PrefsGUIEditorWindowRosettaUI.RegisterObjCheckExtension(new PrefsGUIEditorRosettaUIObjCheckExtension());
         }
 
         private class PrefsGUIEditorRosettaUIObjCheckExtension : IPrefsGUIEditorRosettaUIObjCheckExtension

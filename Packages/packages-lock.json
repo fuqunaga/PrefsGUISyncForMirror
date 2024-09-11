@@ -19,17 +19,17 @@
       "depth": 0,
       "source": "builtin",
       "dependencies": {
-        "com.unity.ide.visualstudio": "2.0.17",
-        "com.unity.ide.rider": "3.0.18",
+        "com.unity.ide.visualstudio": "2.0.22",
+        "com.unity.ide.rider": "3.0.31",
         "com.unity.ide.vscode": "1.2.5",
         "com.unity.editorcoroutines": "1.0.0",
         "com.unity.performance.profile-analyzer": "1.2.2",
-        "com.unity.test-framework": "1.1.31",
-        "com.unity.testtools.codecoverage": "1.2.2"
+        "com.unity.test-framework": "1.1.33",
+        "com.unity.testtools.codecoverage": "1.2.6"
       }
     },
     "com.unity.ide.rider": {
-      "version": "3.0.21",
+      "version": "3.0.31",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -38,7 +38,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.visualstudio": {
-      "version": "2.0.18",
+      "version": "2.0.22",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -61,14 +61,14 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.settings-manager": {
-      "version": "1.0.3",
+      "version": "2.0.1",
       "depth": 2,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
     "com.unity.test-framework": {
-      "version": "1.1.31",
+      "version": "1.1.33",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -79,21 +79,12 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.testtools.codecoverage": {
-      "version": "1.2.2",
+      "version": "1.2.6",
       "depth": 1,
       "source": "registry",
       "dependencies": {
         "com.unity.test-framework": "1.0.16",
         "com.unity.settings-manager": "1.0.1"
-      },
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.textmeshpro": {
-      "version": "3.0.6",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.ugui": "1.0.0"
       },
       "url": "https://packages.unity.com"
     },
@@ -105,16 +96,6 @@
         "com.unity.modules.ui": "1.0.0",
         "com.unity.modules.imgui": "1.0.0"
       }
-    },
-    "com.unity.visualscripting": {
-      "version": "1.8.0",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.ugui": "1.0.0",
-        "com.unity.modules.jsonserialize": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
     },
     "com.veriorpies.parrelsync": {
       "version": "https://github.com/VeriorPies/ParrelSync.git?path=/ParrelSync",
@@ -141,15 +122,14 @@
       "url": "https://registry.npmjs.com"
     },
     "ga.fuquna.prefsgui.rosettaui": {
-      "version": "1.0.2",
+      "version": "file:C:/unity/PrefsGUI/Packages/ga.fuquna.prefsgui.rosettaui",
       "depth": 0,
-      "source": "registry",
+      "source": "local",
       "dependencies": {
-        "ga.fuquna.prefsgui": "3.2.4",
-        "ga.fuquna.rosettaui": "1.1.3",
-        "ga.fuquna.rosettaui.uitoolkit": "1.1.1"
-      },
-      "url": "https://registry.npmjs.com"
+        "ga.fuquna.prefsgui": "3.4.3",
+        "ga.fuquna.rosettaui": "1.8.0",
+        "ga.fuquna.rosettaui.uitoolkit": "1.7.0"
+      }
     },
     "ga.fuquna.prefsguisyncformirror": {
       "version": "file:ga.fuquna.prefsguisyncformirror",
@@ -167,18 +147,18 @@
       "url": "https://registry.npmjs.com"
     },
     "ga.fuquna.rosettaui": {
-      "version": "1.2.0",
-      "depth": 0,
+      "version": "1.8.0",
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://registry.npmjs.com"
     },
     "ga.fuquna.rosettaui.uitoolkit": {
-      "version": "1.2.2",
-      "depth": 0,
+      "version": "1.7.0",
+      "depth": 1,
       "source": "registry",
       "dependencies": {
-        "ga.fuquna.rosettaui": "1.2.0"
+        "ga.fuquna.rosettaui": "1.7.0"
       },
       "url": "https://registry.npmjs.com"
     },
@@ -313,17 +293,6 @@
     "com.unity.modules.uielements": {
       "version": "1.0.0",
       "depth": 0,
-      "source": "builtin",
-      "dependencies": {
-        "com.unity.modules.ui": "1.0.0",
-        "com.unity.modules.imgui": "1.0.0",
-        "com.unity.modules.jsonserialize": "1.0.0",
-        "com.unity.modules.uielementsnative": "1.0.0"
-      }
-    },
-    "com.unity.modules.uielementsnative": {
-      "version": "1.0.0",
-      "depth": 1,
       "source": "builtin",
       "dependencies": {
         "com.unity.modules.ui": "1.0.0",
