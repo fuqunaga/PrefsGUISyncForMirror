@@ -1,12 +1,9 @@
 using PrefsGUI.Example;
-using UnityEngine;
-#if PrefsGUI_RosettaUI
 using RosettaUI;
-#endif
+using UnityEngine;
 
 namespace PrefsGUI.RosettaUI.Example
 {
-#if PrefsGUI_RosettaUI
     [RequireComponent(typeof(RosettaUIRoot))]
     public class PrefsGUIRosettaUIExample : MonoBehaviour
     {
@@ -18,23 +15,20 @@ namespace PrefsGUI.RosettaUI.Example
             root.Build(CreateElement());
         }
 
-        Element CreateElement()
+        private Element CreateElement()
         {
             return UI.Window(
                 "PrefsGUI - RosettaUI",
-                UI.WindowLauncher<PrefsGUIExample_Part1>("Part1"),
-                UI.WindowLauncher<PrefsGUIExample_Part2>("Part2"),
-                UI.WindowLauncher<PrefsGUIExample_Part3>("Part3"),
+                UI.WindowLauncher<PrefsGUIExample_Primitive>("Primitive"),
+                UI.WindowLauncher<PrefsGUIRosettaUIExample_Slider>("Slider"),
+                UI.WindowLauncher<PrefsGUIRosettaUIExample_MinMaxSlider>("MinMaxSlider"),
+                UI.WindowLauncher<PrefsGUIExample_Dictionary>("Dictionary"),
                 UI.WindowLauncher(UI.Window(nameof(PrefsSearch), PrefsSearch.CreateElement())),
                 UI.Space().SetHeight(15f),
-                UI.Label(() => $"file path: {Kvs.PrefsKvsPathSelector.path}"),
+                UI.Label(() => $"file path: {Kvs.PrefsKvsPathSelector.Path}"),
                 UI.Button(nameof(Prefs.Save), Prefs.Save),
                 UI.Button(nameof(Prefs.DeleteAll), Prefs.DeleteAll)
             ).SetPosition(position);
         }
     }
-#else
-    public class PrefsGUIRosettaUIExample : MonoBehaviour
-    {}
-#endif
 }
