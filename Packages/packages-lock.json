@@ -105,7 +105,7 @@
       "hash": "f45424822189ebd875d864a17d7f03b72eafbff7"
     },
     "ga.fuquna.prefsgui": {
-      "version": "3.2.4",
+      "version": "3.5.0",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
@@ -122,21 +122,22 @@
       "url": "https://registry.npmjs.com"
     },
     "ga.fuquna.prefsgui.rosettaui": {
-      "version": "file:C:/unity/PrefsGUI/Packages/ga.fuquna.prefsgui.rosettaui",
+      "version": "1.3.0",
       "depth": 0,
-      "source": "local",
+      "source": "registry",
       "dependencies": {
-        "ga.fuquna.prefsgui": "3.4.3",
+        "ga.fuquna.prefsgui": "3.5.0",
         "ga.fuquna.rosettaui": "1.8.0",
         "ga.fuquna.rosettaui.uitoolkit": "1.7.0"
-      }
+      },
+      "url": "https://registry.npmjs.com"
     },
     "ga.fuquna.prefsguisyncformirror": {
       "version": "file:ga.fuquna.prefsguisyncformirror",
       "depth": 0,
       "source": "embedded",
       "dependencies": {
-        "ga.fuquna.prefsgui": "3.2.4"
+        "ga.fuquna.prefsgui": "3.5.0"
       }
     },
     "ga.fuquna.rapidgui": {
@@ -148,14 +149,14 @@
     },
     "ga.fuquna.rosettaui": {
       "version": "1.8.0",
-      "depth": 1,
+      "depth": 0,
       "source": "registry",
       "dependencies": {},
       "url": "https://registry.npmjs.com"
     },
     "ga.fuquna.rosettaui.uitoolkit": {
       "version": "1.7.0",
-      "depth": 1,
+      "depth": 0,
       "source": "registry",
       "dependencies": {
         "ga.fuquna.rosettaui": "1.7.0"
