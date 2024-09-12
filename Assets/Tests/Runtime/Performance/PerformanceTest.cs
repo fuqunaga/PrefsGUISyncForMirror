@@ -30,22 +30,20 @@ namespace PrefsGUI.Sync.Example
 
         private void Update()
         {
-            if (updatePrefsValues)
+            if (!updatePrefsValues) return;
+            
+            foreach (var prefs in prefsFloats)
             {
-                foreach (var prefs in prefsFloats)
-                {
-                    prefs.Set(Random.value);
-                }
+                prefs.Set(Random.value);
+            }
                 
-                foreach (var prefs in prefsStrings)
-                {
-                    prefs.Set(_stringValues[Random.Range(0,count)]);
-                }
-
+            foreach (var prefs in prefsStrings)
+            {
+                prefs.Set(_stringValues[Random.Range(0,count)]);
             }
         }
 
-        void ResetPrefs()
+        private void ResetPrefs()
         {
             prefsFloats = Enumerable.Range(0, count)
                 .Select(i => new PrefsFloat(nameof(PrefsFloat) + i))
@@ -61,7 +59,7 @@ namespace PrefsGUI.Sync.Example
             }
         }
 
-        public Element CreateElement()
+        private Element CreateElement()
         {
             return UI.Window(nameof(PerformanceTest),
                 UI.Field(() => count).RegisterValueChangeCallback(ResetPrefs),
