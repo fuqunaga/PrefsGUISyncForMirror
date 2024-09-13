@@ -9,6 +9,9 @@ using UnityEngine;
 
 namespace PrefsGUI.Sync.Example
 {
+    /// <summary>
+    /// 動的にPrefsの数を増やしパフォーマンスを測る
+    /// </summary>
     public class PerformanceTest : NetworkBehaviour
     {
         public RosettaUIRoot uiRoot;
