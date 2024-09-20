@@ -5,7 +5,9 @@ using System.Linq;
 using Mirror;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Events;
 using UnityEngine.Pool;
+using UnityEngine.Serialization;
 
 namespace PrefsGUI.Sync
 {
@@ -16,7 +18,7 @@ namespace PrefsGUI.Sync
     {
         #region Server parameters
         
-        public int spawnDataBytesPerChunk = 100000;
+        public int spawnDataBytesPerChunk = 1000000;
         
         // すでに分割Spawnを開始したコネクションのリスト
         private readonly HashSet<NetworkConnectionToClient> _spawnedConnections = new();
@@ -30,18 +32,36 @@ namespace PrefsGUI.Sync
         
         #endregion
 
-
+        public UnityEvent onSpawnFinished;
         public bool debugLog;
+        private bool _isSpawnFinished;
         
         // Spawnデータを分割するSyncObjectのリスト
         // サーバーとクライアントで同じものを指定している必要がある
         // SerializeAll/DeserializeAllでは無視しTargetRpcで別途データを分割送信する
         protected abstract IEnumerable<SyncObject> DivideTargetSyncObjects { get; }
 
-        // すべてのSpawn処理が終わったか
-        // クライアント側はOnDeserializeでfalseになり、分割データが全て受信された段階でtrueになる
-        public virtual bool IsSpawnFinished { get; protected set; } = true;
+        public virtual bool IsSpawnFinished
+        {
+            get => _isSpawnFinished;
+            protected set
+            {
+                if ( _isSpawnFinished == value ) return;
+                
+                _isSpawnFinished = value;
+                if ( _isSpawnFinished )
+                {
+                    onSpawnFinished?.Invoke();
+                }
+            }
+        } 
 
+        
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+            IsSpawnFinished = true;
+        }
 
         private void CheckNewConnection(ulong divideTargetMask)
         {
@@ -212,10 +232,7 @@ namespace PrefsGUI.Sync
                 }
             }
 
-            if (divideTargetMask != 0)
-            {
-                IsSpawnFinished = false;
-            }
+            IsSpawnFinished = divideTargetMask == 0;
         }
         
         #endregion
