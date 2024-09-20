@@ -17,6 +17,7 @@ namespace PrefsGUI.Sync
     {
         #region Server parameters
         
+        public bool enableDivideSpawnData = true;
         public int spawnDataBytesPerChunk = 100000;
         
         // すでに分割Spawnを開始したコネクションのリスト
@@ -60,6 +61,15 @@ namespace PrefsGUI.Sync
         {
             base.OnStartServer();
             IsSpawnFinished = true;
+        }
+
+        public override void OnStartClient()
+        {
+            base.OnStartClient();
+            if (!enableDivideSpawnData)
+            {
+                IsSpawnFinished = true;
+            }
         }
 
         private void CheckNewConnection(ulong divideTargetMask)
@@ -160,6 +170,12 @@ namespace PrefsGUI.Sync
         {
             DebugLog($"{nameof(OnSerialize)} initialState:{initialState}");
             
+            if (!enableDivideSpawnData)
+            {
+                base.OnSerialize(writer, initialState);
+                return;
+            }
+            
             if (!initialState)
             {
                 base.OnSerialize(writer, false);
@@ -193,6 +209,13 @@ namespace PrefsGUI.Sync
         public override void OnDeserialize(NetworkReader reader, bool initialState)
         {
             DebugLog($"{nameof(OnDeserialize)} initialState:{initialState}");
+            
+            if (!enableDivideSpawnData)
+            {
+                base.OnDeserialize(reader, initialState);
+                return;
+            }
+            
             
             if (!initialState)
             {
