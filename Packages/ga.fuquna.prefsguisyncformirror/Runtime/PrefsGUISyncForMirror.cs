@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Mirror;
 using UnityEngine;
@@ -20,7 +21,9 @@ namespace PrefsGUI.Sync
         private List<string> ignoreKeyList = new();
         
         private HashSet<string> _ignoreKeys;
-        private HashSet<string> _receivedKey;
+        private HashSet<PrefsParam> _registerCallbackPrefsSet;
+        private readonly HashSet<PrefsParam> _valueChangedPrefsSet = new();
+        private HashSet<string> _receivedKeys;
         
         private readonly SyncDictionary<string, byte[]> _syncDictionary = new();
         private List<SyncObject> _divideSpawnDataSyncObjects;
@@ -38,32 +41,57 @@ namespace PrefsGUI.Sync
             syncInterval = 0f;
         }
 
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+
+            if (_registerCallbackPrefsSet != null) return;
+
+            var targetPrefsEnumerable = PrefsParam.all.Where(prefs => !_ignoreKeys.Contains(prefs.key));
+            
+            _registerCallbackPrefsSet = new HashSet<PrefsParam>(targetPrefsEnumerable);
+            foreach (var prefs in _registerCallbackPrefsSet)
+            {
+                prefs.RegisterValueChangedCallback(() => _valueChangedPrefsSet.Add(prefs));
+            }
+            
+            PrefsParam.onRegisterPrefsParam += prefs =>
+            {
+                if (_ignoreKeys.Contains(prefs.key)) return;
+              
+                var success = _registerCallbackPrefsSet.Add(prefs);
+                if (success)
+                {
+                    prefs.RegisterValueChangedCallback(() => _valueChangedPrefsSet.Add(prefs));
+                }
+            };
+        }
+
         public override void OnStartClient()
         {
             base.OnStartClient();
 
             // ignore when "Host"
-            if (!NetworkServer.active)
+            if (NetworkServer.active) return;
+            
+            _receivedKeys = new HashSet<string>(_syncDictionary.Keys);
+            _syncDictionary.Callback += (op, key, _) =>
             {
-                _receivedKey = new(_syncDictionary.Keys);
-                _syncDictionary.Callback += (op, key, _) =>
+                switch (op)
                 {
-                    switch (op)
-                    {
-                        case SyncIDictionary<string, byte[]>.Operation.OP_ADD:
-                        case SyncIDictionary<string, byte[]>.Operation.OP_SET:
-                            _receivedKey.Add(key);
-                            break;
+                    case SyncIDictionary<string, byte[]>.Operation.OP_ADD:
+                    case SyncIDictionary<string, byte[]>.Operation.OP_SET:
+                        _receivedKeys.Add(key);
+                        break;
 
-                        case SyncIDictionary<string, byte[]>.Operation.OP_CLEAR:
-                        case SyncIDictionary<string, byte[]>.Operation.OP_REMOVE:
-                            _receivedKey.Remove(key);
-                            break;
-                    }
-                };
+                    case SyncIDictionary<string, byte[]>.Operation.OP_CLEAR:
+                    case SyncIDictionary<string, byte[]>.Operation.OP_REMOVE:
+                        _receivedKeys.Remove(key);
+                        break;
+                }
+            };
                 
-                ReadPrefs(true);
-            }
+            ReadPrefs(true);
         }
 
         public void Update()
@@ -110,17 +138,26 @@ namespace PrefsGUI.Sync
 
         #region Server
         
+
         [ServerCallback]
         private void SendPrefs()
         {
-            foreach (var prefs in PrefsParam.all)
+            foreach (var prefs in _valueChangedPrefsSet)
             {
-                var key = prefs.key;
-                if (HasIgnoreKey(key)) continue;
-
                 WritePrefsToSyncDictionary(prefs);
             }
+            
+            _valueChangedPrefsSet.Clear();
+            
+            // foreach (var prefs in PrefsParam.all)
+            // {
+            //     var key = prefs.key;
+            //     if (HasIgnoreKey(key)) continue;
+            //
+            //     WritePrefsToSyncDictionary(prefs);
+            // }
         }
+
 
         private readonly Dictionary<Type, Action<PrefsParam>> _toDictionaryTable = new();
 
@@ -154,13 +191,13 @@ namespace PrefsGUI.Sync
         [ClientCallback]
         private void ReadPrefs(bool checkAlreadyGet = false)
         {
-            if ( _receivedKey == null) return;
+            if ( _receivedKeys == null) return;
             
             var allDic = PrefsParam.allDic;
 
             using var _ = ListPool<string>.Get(out var removeKeys);
 
-            foreach (var key in _receivedKey)
+            foreach (var key in _receivedKeys)
             {
                 if (!allDic.TryGetValue(key, out var prefs)) continue;
                 removeKeys.Add(key);
@@ -174,7 +211,7 @@ namespace PrefsGUI.Sync
                 }
             }
             
-            _receivedKey.ExceptWith(removeKeys);
+            _receivedKeys.ExceptWith(removeKeys);
         }
 
         
