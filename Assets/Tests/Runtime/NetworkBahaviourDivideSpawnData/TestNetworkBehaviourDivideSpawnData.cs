@@ -44,10 +44,7 @@ namespace PrefsGUI.Sync.Example
             {
                 syncDictionary[_changeValueKey] = Random.value.ToString(CultureInfo.InvariantCulture);
             }
-            
-            // Debug.Log(IsSpawnFinished);
         }
-
 
         private Element CreateElement()
         {

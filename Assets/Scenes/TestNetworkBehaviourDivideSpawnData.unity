@@ -198,8 +198,9 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  spawnDataSizePerChunk: 1024
-  elementCount: 1000
+  spawnDataBytesPerChunk: 100000
+  debugLog: 1
+  elementCount: 1000000
   rosettaUIRoot: {fileID: 92117955}
 --- !u!1 &750491124
 GameObject:
