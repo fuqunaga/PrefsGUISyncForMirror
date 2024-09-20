@@ -56,16 +56,29 @@ namespace PrefsGUI.Sync.Example
             
             return UI.Window(
                 UI.Page(
+                    UI.FieldReadOnly(() => IsSpawnFinished),
                     UI.Field(() => displayStartIndex),
                     UI.Field(() => displayElementCount),
                     UI.Field(() => _changeValueRandom),
                     UI.Field(() => _changeValueKey),
                     UI.FieldReadOnly("SyncDictionary", () =>
                         {
-                            var elementStrings = syncDictionary
-                                .Skip(displayStartIndex)
-                                .Take(displayElementCount)
-                                .Select(pair => pair.ToString());
+                            // var elementStrings = syncDictionary
+                            //     .Skip(displayStartIndex)
+                            //     .Take(displayElementCount)
+                            //     .Select(pair => pair.ToString());
+                            //
+                            // ↑ Skip が重い
+
+                            var elementStrings = Enumerable.Range(displayStartIndex, displayElementCount)
+                                .Select(i =>
+                                {
+                                    var key = i.ToString();
+                                    return syncDictionary.TryGetValue(key, out var value)
+                                        ? (key, value).ToString()
+                                        : $"{key}: no data";
+
+                                });
 
                             return string.Join("\n", elementStrings);
                         }
