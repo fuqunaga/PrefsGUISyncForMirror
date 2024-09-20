@@ -16,7 +16,7 @@ namespace PrefsGUI.Sync
     {
         #region Server parameters
         
-        public int spawnDataSizePerChunk = 100 * 1024;
+        public int spawnDataBytesPerChunk = 100000;
         
         // すでに分割Spawnを開始したコネクションのリスト
         private readonly HashSet<NetworkConnectionToClient> _spawnedConnections = new();
@@ -29,6 +29,9 @@ namespace PrefsGUI.Sync
         private int _lastReceivedSyncObjectIndex = -1;
         
         #endregion
+
+
+        public bool debugLog;
         
         // Spawnデータを分割するSyncObjectのリスト
         // サーバーとクライアントで同じものを指定している必要がある
@@ -36,7 +39,7 @@ namespace PrefsGUI.Sync
         protected abstract IEnumerable<SyncObject> DivideTargetSyncObjects { get; }
 
         // すべてのSpawn処理が終わったか
-        // クライアント側のOnDeserializeでfalseになる
+        // クライアント側はOnDeserializeでfalseになり、分割データが全て受信された段階でtrueになる
         public virtual bool IsSpawnFinished { get; protected set; } = true;
 
 
@@ -78,20 +81,22 @@ namespace PrefsGUI.Sync
                 targetSyncObject.OnSerializeAll(writer);
                 
                 var bytes = writer.ToArraySegment();
-                for(var sendPosition = 0; sendPosition < bytes.Count; sendPosition += spawnDataSizePerChunk)
+                for(var sendPosition = 0; sendPosition < bytes.Count; sendPosition += spawnDataBytesPerChunk)
                 {
                     // 即送信はダメ
                     // NetworkBehaviour.OnSerialize()内で呼ばれるがそこでは送信できないっぽい
                     yield return null;
                     
-                    var lastSend = sendPosition + spawnDataSizePerChunk >= bytes.Count;
-                    var sendSize = lastSend ? bytes.Count - sendPosition : spawnDataSizePerChunk;
+                    var lastSend = sendPosition + spawnDataBytesPerChunk >= bytes.Count;
+                    var sendSize = lastSend ? bytes.Count - sendPosition : spawnDataBytesPerChunk;
 
                     TargetSendDividedSpawnData(connection,
                         syncObjectIndex,
                         bytes.Slice(sendPosition, sendSize),
                         lastSend
                     );
+                    
+                    DebugLog($"SendSpawnData syncObjectIndex:{syncObjectIndex} {sendPosition}/{bytes.Count}  lastSend:{lastSend}");
                 }
             }
         }
@@ -125,6 +130,8 @@ namespace PrefsGUI.Sync
                     IsSpawnFinished = true;
                 }
             }
+            
+            DebugLog($"ReceiveSpawnData syncObjectIndex:{syncObjectIndex} size:{bytes.Count}  isLast:{isLast}");
         }
 
         
@@ -132,12 +139,11 @@ namespace PrefsGUI.Sync
         
         public override void OnSerialize(NetworkWriter writer, bool initialState)
         {
-            // Debug.Log($"{nameof(OnSerialize)}: {initialState}, {Time.frameCount}");
+            DebugLog($"{nameof(OnSerialize)} initialState:{initialState}");
             
             if (!initialState)
             {
                 base.OnSerialize(writer, false);
-                // SerializeSpawningDeltaData();
             }
             else
             {
@@ -154,8 +160,8 @@ namespace PrefsGUI.Sync
         private void SerializeObjectsAllWithMask(NetworkWriter writer, ulong divideTargetMask)
         {
              Compression.CompressVarUInt(writer, divideTargetMask);
-             
-             for(var i=0; i<syncObjects.Count; i++)
+
+             for (var i = 0; i < syncObjects.Count; i++)
              {
                  if ((divideTargetMask & (1ul << i)) == 0)
                  {
@@ -167,7 +173,7 @@ namespace PrefsGUI.Sync
         
         public override void OnDeserialize(NetworkReader reader, bool initialState)
         {
-            // Debug.Log($"{nameof(OnDeserialize)}: {initialState}, {Time.frameCount}");
+            DebugLog($"{nameof(OnDeserialize)} initialState:{initialState}");
             
             if (!initialState)
             {
@@ -182,8 +188,6 @@ namespace PrefsGUI.Sync
         
         private void DeserializeObjectsAllWithMask(NetworkReader reader)
         {
-            Debug.Log($"{nameof(OnDeserialize)}: {Time.frameCount}");
-            
             var divideTargetMask = Compression.DecompressVarUInt(reader);
 
             for (var i = 0; i < syncObjects.Count; i++)
@@ -195,7 +199,16 @@ namespace PrefsGUI.Sync
                 // DivideTargetはダミーに入れ替える
                 else
                 {
-                    syncObjects[i] = new DividedSpawnDataReceiverSyncObject(syncObjects[i]); 
+                    // syncObjects[i]がDividedSpawnDataReceiverSyncObjectでない場合は元に戻す
+                    // 分割Spawnデータ受信中にあらたにSpawnされた場合
+                    var baseSyncObject = syncObjects[i];
+                    if (baseSyncObject is DividedSpawnDataReceiverSyncObject receiverSyncObject)
+                    {
+                        baseSyncObject = receiverSyncObject.baseSyncObject;
+                        receiverSyncObject.Dispose();
+                    }
+                    
+                    syncObjects[i] = new DividedSpawnDataReceiverSyncObject(baseSyncObject);
                 }
             }
 
@@ -206,5 +219,13 @@ namespace PrefsGUI.Sync
         }
         
         #endregion
+
+        protected virtual void DebugLog(string message)
+        {
+            if ( debugLog )
+            {
+                Debug.Log($"{Time.frameCount} {message}");
+            }
+        }
     }
 }
