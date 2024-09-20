@@ -12,21 +12,24 @@ namespace PrefsGUI.Sync
     /// Sync PrefsGUI parameter over UNET
     /// </summary>
     [DefaultExecutionOrder(-1)]
-    public class PrefsGUISyncForMirror : NetworkBehaviour, ISerializationCallbackReceiver
+    public class PrefsGUISyncForMirror : NetworkBehaviourDivideSpawnData, ISerializationCallbackReceiver
     {
         // want use HashSet but use List so it will be serialized on Inspector
         [SerializeField]
         [FormerlySerializedAs("ignoreKeys")]
         private List<string> ignoreKeyList = new();
-
+        
         private HashSet<string> _ignoreKeys;
-
-        private readonly SyncDictionary<string, byte[]> _syncDictionary = new();
         private HashSet<string> _receivedKey;
         
+        private readonly SyncDictionary<string, byte[]> _syncDictionary = new();
+        private List<SyncObject> _divideSpawnDataSyncObjects;
         
         public IEnumerable<string> IgnoreKeys => ignoreKeyList;
 
+        protected override IEnumerable<SyncObject> DivideTargetSyncObjects =>
+            _divideSpawnDataSyncObjects ??= new List<SyncObject> { _syncDictionary };
+        
         
         #region Unity
         

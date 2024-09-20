@@ -7,7 +7,6 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
 using UnityEngine.Pool;
-using UnityEngine.Serialization;
 
 namespace PrefsGUI.Sync
 {
@@ -18,7 +17,7 @@ namespace PrefsGUI.Sync
     {
         #region Server parameters
         
-        public int spawnDataBytesPerChunk = 1000000;
+        public int spawnDataBytesPerChunk = 100000;
         
         // すでに分割Spawnを開始したコネクションのリスト
         private readonly HashSet<NetworkConnectionToClient> _spawnedConnections = new();
@@ -32,8 +31,8 @@ namespace PrefsGUI.Sync
         
         #endregion
 
-        public UnityEvent onSpawnFinished;
         public bool debugLog;
+        public UnityEvent onSpawnFinished;
         private bool _isSpawnFinished;
         
         // Spawnデータを分割するSyncObjectのリスト
