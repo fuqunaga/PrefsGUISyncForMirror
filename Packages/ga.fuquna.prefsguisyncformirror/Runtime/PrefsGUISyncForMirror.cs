@@ -217,6 +217,16 @@ namespace PrefsGUI.Sync
         private void OnSpawnFinished()
         {
             _receivedKeys = new HashSet<string>(_syncDictionary.Keys);
+
+            // If you get an error with Mirror 89.*, please update to 89.4 or later.
+            // No way to know minor version in code.
+            // - https://github.com/MirrorNetworking/Mirror/releases/tag/v89.4.0
+#if MIRROR_89_OR_NEWER
+            _syncDictionary.OnAdd += (key) => _receivedKeys.Add(key);
+            _syncDictionary.OnSet += (key, _) => _receivedKeys.Add(key);
+            _syncDictionary.OnRemove += (key, _) => _receivedKeys.Remove(key);
+            _syncDictionary.OnClear += () => _receivedKeys.Clear();
+#else
             _syncDictionary.Callback += (op, key, _) =>
             {
                 switch (op)
@@ -232,6 +242,7 @@ namespace PrefsGUI.Sync
                         break;
                 }
             };
+#endif
                 
             ReadPrefs(true);
         }
