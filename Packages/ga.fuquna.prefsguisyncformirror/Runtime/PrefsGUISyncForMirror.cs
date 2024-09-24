@@ -21,8 +21,8 @@ namespace PrefsGUI.Sync
         private List<string> ignoreKeyList = new();
         
         private HashSet<string> _ignoreKeys;
-        private HashSet<PrefsParam> _registerCallbackPrefsSet;
-        private readonly HashSet<PrefsParam> _valueChangedPrefsSet = new();
+        private Dictionary<PrefsParam, Action> _prefsAndCallbackTable;
+        private readonly HashSet<PrefsParam> _sendPrefsSet = new();
         private HashSet<string> _receivedKeys;
         
         private readonly SyncDictionary<string, byte[]> _syncDictionary = new();
@@ -41,30 +41,43 @@ namespace PrefsGUI.Sync
             syncInterval = 0f;
         }
 
+
+        public void Update()
+        {
+            SendPrefs();
+            
+            // ignore when "Host"
+            if (!NetworkServer.active)
+            {
+                ReadPrefs();
+            }
+        }
+
+        public void OnBeforeSerialize()
+        {
+        }
+
+        public void OnAfterDeserialize()
+        {
+            _ignoreKeys = new(ignoreKeyList);
+        }
+        
+        #endregion
+        
+        
+        #region Mirror
+        
         public override void OnStartServer()
         {
             base.OnStartServer();
+            RegisterPrefsCallbacks();
 
-            if (_registerCallbackPrefsSet != null) return;
+        }
 
-            var targetPrefsEnumerable = PrefsParam.all.Where(prefs => !_ignoreKeys.Contains(prefs.key));
-            
-            _registerCallbackPrefsSet = new HashSet<PrefsParam>(targetPrefsEnumerable);
-            foreach (var prefs in _registerCallbackPrefsSet)
-            {
-                prefs.RegisterValueChangedCallback(() => _valueChangedPrefsSet.Add(prefs));
-            }
-            
-            PrefsParam.onRegisterPrefsParam += prefs =>
-            {
-                if (_ignoreKeys.Contains(prefs.key)) return;
-              
-                var success = _registerCallbackPrefsSet.Add(prefs);
-                if (success)
-                {
-                    prefs.RegisterValueChangedCallback(() => _valueChangedPrefsSet.Add(prefs));
-                }
-            };
+        public override void OnStopServer()
+        {
+            base.OnStopServer();
+            ClearPrefsCallbacks();
         }
 
         public override void OnStartClient()
@@ -93,26 +106,6 @@ namespace PrefsGUI.Sync
                 
             ReadPrefs(true);
         }
-
-        public void Update()
-        {
-            SendPrefs();
-            
-            // ignore when "Host"
-            if (!NetworkServer.active)
-            {
-                ReadPrefs();
-            }
-        }
-
-        public void OnBeforeSerialize()
-        {
-        }
-
-        public void OnAfterDeserialize()
-        {
-            _ignoreKeys = new(ignoreKeyList);
-        }
         
         #endregion
         
@@ -137,17 +130,66 @@ namespace PrefsGUI.Sync
         
 
         #region Server
+
+        private void RegisterPrefsCallbacks()
+        {
+            var targetPrefsEnumerable = PrefsParam.all.Where(prefs => !_ignoreKeys.Contains(prefs.key));
+            
+            foreach (var prefs in targetPrefsEnumerable)
+            {
+                RegisterPrefsValueChangedCallback(prefs);
+            }
+            
+            PrefsParam.onRegisterPrefsParam += OnRegisterPrefsParam;
+        }
+
+        private void RegisterPrefsValueChangedCallback(PrefsParam prefs)
+        {
+            _prefsAndCallbackTable ??= new Dictionary<PrefsParam, Action>();
+            if (_prefsAndCallbackTable.TryAdd(prefs, ValueChangedCallback))
+            {
+                prefs.RegisterValueChangedCallback(ValueChangedCallback);
+            }
+
+            return;
+
+            void ValueChangedCallback()
+            {
+                _sendPrefsSet.Add(prefs);
+            }
+        }
+        
+        private void OnRegisterPrefsParam(PrefsParam prefs)
+        {
+            if (_ignoreKeys.Contains(prefs.key)) return;
+            RegisterPrefsValueChangedCallback(prefs);
+        }
+        
+        private void ClearPrefsCallbacks()
+        {
+            if (_prefsAndCallbackTable != null)
+            {
+                foreach (var (prefs, callback) in _prefsAndCallbackTable)
+                {
+                    prefs.UnregisterValueChangedCallback(callback);
+                }
+                
+                _prefsAndCallbackTable.Clear();
+            }
+            
+            PrefsParam.onRegisterPrefsParam -= OnRegisterPrefsParam;
+        }
         
 
         [ServerCallback]
         private void SendPrefs()
         {
-            foreach (var prefs in _valueChangedPrefsSet)
+            foreach (var prefs in _sendPrefsSet)
             {
                 WritePrefsToSyncDictionary(prefs);
             }
             
-            _valueChangedPrefsSet.Clear();
+            _sendPrefsSet.Clear();
             
             // foreach (var prefs in PrefsParam.all)
             // {
