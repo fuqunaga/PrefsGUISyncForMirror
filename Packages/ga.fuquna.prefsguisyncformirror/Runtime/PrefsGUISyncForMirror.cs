@@ -26,6 +26,7 @@ namespace PrefsGUI.Sync
         private HashSet<string> _ignoreKeys;
         private Dictionary<PrefsParam, Action> _prefsAndCallbackTable;
         private readonly HashSet<PrefsParam> _sendPrefsSet = new();
+        private readonly List<PrefsParam> _newPrefsList = new();
         private HashSet<string> _receivedKeys;
         
         private readonly SyncDictionary<string, byte[]> _syncDictionary = new();
@@ -73,7 +74,6 @@ namespace PrefsGUI.Sync
         {
             base.OnStartServer();
             RegisterPrefsCallbacks();
-
         }
 
         public override void OnStopServer()
@@ -119,9 +119,9 @@ namespace PrefsGUI.Sync
 
         private void RegisterPrefsCallbacks()
         {
-            var targetPrefsEnumerable = PrefsParam.all.Where(prefs => !_ignoreKeys.Contains(prefs.key));
+            var existingPrefsEnumerable = PrefsParam.all.Where(prefs => !_ignoreKeys.Contains(prefs.key));
             
-            foreach (var prefs in targetPrefsEnumerable)
+            foreach (var prefs in existingPrefsEnumerable)
             {
                 RegisterPrefsValueChangedCallback(prefs);
             }
@@ -132,16 +132,20 @@ namespace PrefsGUI.Sync
         private void RegisterPrefsValueChangedCallback(PrefsParam prefs)
         {
             _prefsAndCallbackTable ??= new Dictionary<PrefsParam, Action>();
-            if (_prefsAndCallbackTable.TryAdd(prefs, ValueChangedCallback))
-            {
-                prefs.RegisterValueChangedCallback(ValueChangedCallback);
-            }
+            var success = _prefsAndCallbackTable.TryAdd(prefs, ValueChangedCallback);
+            if (!success) return;
+
+            prefs.RegisterValueChangedCallback(ValueChangedCallback);
             
-            var needSend = !prefs.IsDefault || !syncOnlyValueChangedPrefs;
-            if (needSend)
-            {
-                ValueChangedCallback();
-            }
+            // ここで prefs.IsDefault はエラーになる
+            // PrefsParam.onRegisterPrefsParam 経由で呼ばれるとAwake()内等などで、prefsのデフォルト値へのアクセスがエラーになるっぽい
+            //
+            // var needSend = !prefs.IsDefault || !syncOnlyValueChangedPrefs;
+            // if (needSend)
+            // {
+            //     ValueChangedCallback();
+            // }
+            _newPrefsList.Add(prefs);
 
             return;
 
@@ -176,11 +180,21 @@ namespace PrefsGUI.Sync
         [ServerCallback]
         private void SendPrefs()
         {
+            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+            foreach (var prefs in _newPrefsList)
+            {
+                var needSend = !syncOnlyValueChangedPrefs || !prefs.IsDefault;
+                if (!needSend) continue;
+                
+                _sendPrefsSet.Add(prefs);
+            }
+            _newPrefsList.Clear();
+
+            
             foreach (var prefs in _sendPrefsSet)
             {
                 WritePrefsToSyncDictionary(prefs);
             }
-            
             _sendPrefsSet.Clear();
         }
 
