@@ -15,6 +15,9 @@ namespace PrefsGUI.Sync
     [DefaultExecutionOrder(-1)]
     public class PrefsGUISyncForMirror : NetworkBehaviourDivideSpawnData, ISerializationCallbackReceiver
     {
+        [Tooltip("Prefs that have never been changed from their default values will not be synced.")]
+        public bool syncOnlyValueChangedPrefs = true;
+        
         // want use HashSet but use List so it will be serialized on Inspector
         [SerializeField]
         [FormerlySerializedAs("ignoreKeys")]
@@ -46,8 +49,7 @@ namespace PrefsGUI.Sync
         {
             SendPrefs();
             
-            // ignore when "Host"
-            if (!NetworkServer.active)
+            if (isClientOnly)
             {
                 ReadPrefs();
             }
@@ -82,29 +84,13 @@ namespace PrefsGUI.Sync
 
         public override void OnStartClient()
         {
-            base.OnStartClient();
-
-            // ignore when "Host"
-            if (NetworkServer.active) return;
-            
-            _receivedKeys = new HashSet<string>(_syncDictionary.Keys);
-            _syncDictionary.Callback += (op, key, _) =>
+            // base.OnStartClient()内でonSpawnFinishedが呼ばれることがあるためメソッドの順番注意
+            if (isClientOnly)
             {
-                switch (op)
-                {
-                    case SyncIDictionary<string, byte[]>.Operation.OP_ADD:
-                    case SyncIDictionary<string, byte[]>.Operation.OP_SET:
-                        _receivedKeys.Add(key);
-                        break;
+                onSpawnFinished.AddListener(OnSpawnFinished);
+            }
 
-                    case SyncIDictionary<string, byte[]>.Operation.OP_CLEAR:
-                    case SyncIDictionary<string, byte[]>.Operation.OP_REMOVE:
-                        _receivedKeys.Remove(key);
-                        break;
-                }
-            };
-                
-            ReadPrefs(true);
+            base.OnStartClient();
         }
         
         #endregion
@@ -150,6 +136,12 @@ namespace PrefsGUI.Sync
             {
                 prefs.RegisterValueChangedCallback(ValueChangedCallback);
             }
+            
+            var needSend = !prefs.IsDefault || !syncOnlyValueChangedPrefs;
+            if (needSend)
+            {
+                ValueChangedCallback();
+            }
 
             return;
 
@@ -190,14 +182,6 @@ namespace PrefsGUI.Sync
             }
             
             _sendPrefsSet.Clear();
-            
-            // foreach (var prefs in PrefsParam.all)
-            // {
-            //     var key = prefs.key;
-            //     if (HasIgnoreKey(key)) continue;
-            //
-            //     WritePrefsToSyncDictionary(prefs);
-            // }
         }
 
 
@@ -229,6 +213,28 @@ namespace PrefsGUI.Sync
 
 
         #region Client
+
+        private void OnSpawnFinished()
+        {
+            _receivedKeys = new HashSet<string>(_syncDictionary.Keys);
+            _syncDictionary.Callback += (op, key, _) =>
+            {
+                switch (op)
+                {
+                    case SyncIDictionary<string, byte[]>.Operation.OP_ADD:
+                    case SyncIDictionary<string, byte[]>.Operation.OP_SET:
+                        _receivedKeys.Add(key);
+                        break;
+
+                    case SyncIDictionary<string, byte[]>.Operation.OP_CLEAR:
+                    case SyncIDictionary<string, byte[]>.Operation.OP_REMOVE:
+                        _receivedKeys.Remove(key);
+                        break;
+                }
+            };
+                
+            ReadPrefs(true);
+        }
 
         [ClientCallback]
         private void ReadPrefs(bool checkAlreadyGet = false)

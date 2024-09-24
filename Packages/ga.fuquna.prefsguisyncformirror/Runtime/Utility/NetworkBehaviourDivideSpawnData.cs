@@ -32,6 +32,7 @@ namespace PrefsGUI.Sync
         
         #endregion
 
+        
         public bool debugLog;
         public UnityEvent onSpawnFinished;
         private bool _isSpawnFinished;

@@ -543,15 +543,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d296b2b8f9c75014b855c084337c52c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
   uiRoot: {fileID: 1609987441}
   windowPosition: {x: 0, y: 150}
   count: 100000
   showPrefsIndex: 0
   showPrefsCount: 10
   updatePrefsValue: 1
+  setRandomValueToAllPrefs: 0
   prefsStrings: []
 --- !u!4 &2054551899
 Transform:

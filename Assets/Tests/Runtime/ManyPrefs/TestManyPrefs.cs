@@ -23,6 +23,7 @@ namespace PrefsGUI.Sync.Example
         public int showPrefsIndex;
         public int showPrefsCount;
         public bool updatePrefsValue;
+        public bool setRandomValueToAllPrefs;
         public List<PrefsString> prefsStrings;
 
         private static List<string> _stringValues = new();
@@ -30,6 +31,11 @@ namespace PrefsGUI.Sync.Example
         public void Start()
         {
             ResetPrefs();
+            if (setRandomValueToAllPrefs)
+            {
+                SetRandomValueToAllPrefs();
+            }
+            
             uiRoot.Build(CreateElement());
         }
         
@@ -51,6 +57,14 @@ namespace PrefsGUI.Sync.Example
             if (_stringValues.Count <= count)
             {
                 _stringValues = Enumerable.Range(0, count).Select(i => i.ToString()).ToList();
+            }
+        }
+        
+        private void SetRandomValueToAllPrefs()
+        {
+            foreach (var prefsString in prefsStrings)
+            {
+                prefsString.Set(Random.value.ToString(CultureInfo.InvariantCulture));
             }
         }
 
