@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace PrefsGUI.Sync.Editor
 {
@@ -14,22 +16,24 @@ namespace PrefsGUI.Sync.Editor
                 if (_sync == null)
                 {
                     _sync = Object.FindObjectOfType<PrefsGUISyncForMirror>();
-                    if (_sync == null)
-                    {
-                        Debug.LogWarning($"nameof(PrefsGUISyncForMirror) is not found");
-                    }
                 }
 
                 return _sync;
             }
         }
 
-        public static IEnumerable<string> IgnoreKeys => Sync.IgnoreKeys;
+        public static IEnumerable<string> IgnoreKeys => Sync != null ? Sync.IgnoreKeys : Array.Empty<string>();
 
-        public static bool GetSyncFlag(string key) => !Sync.HasIgnoreKey(key); 
+        public static bool GetSyncFlag(string key) => Sync != null && !Sync.HasIgnoreKey(key); 
         
         public static void SetSyncFlag(string key, bool syncFlag)
         {
+            if (Sync == null)
+            {
+                Debug.LogWarning($"{nameof(PrefsGUISyncForMirror)} is not found.");
+                return;
+            }
+            
             RegisterUndoAndSetDirty(Sync);
 
             if (!syncFlag) 
@@ -40,6 +44,12 @@ namespace PrefsGUI.Sync.Editor
         
         public static void SetSyncFlags(IEnumerable<string> keys, bool syncFlag)
         {
+            if (Sync == null)
+            {
+                Debug.LogWarning($"{nameof(PrefsGUISyncForMirror)} is not found.");
+                return;
+            }
+            
             RegisterUndoAndSetDirty(Sync);
             
             if (!syncFlag)
@@ -50,7 +60,7 @@ namespace PrefsGUI.Sync.Editor
                     Sync.RemoveIgnoreKey(key);
         }
 
-        static void RegisterUndoAndSetDirty(Object sync)
+        private static void RegisterUndoAndSetDirty(Object sync)
         {
             Undo.RecordObject(sync, "PrefsGUISync change sync flag");
             EditorUtility.SetDirty(sync);
