@@ -112,20 +112,10 @@
       "hash": "d1ef610e9fe3ad0b490cce91594449fc0af809a6"
     },
     "ga.fuquna.prefsgui": {
-      "version": "3.5.0",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://registry.npmjs.com"
-    },
-    "ga.fuquna.prefsgui.rapidgui": {
-      "version": "0.0.2",
+      "version": "3.6.0",
       "depth": 0,
       "source": "registry",
-      "dependencies": {
-        "ga.fuquna.prefsgui": "3.2.0",
-        "ga.fuquna.rapidgui": "1.2.3"
-      },
+      "dependencies": {},
       "url": "https://registry.npmjs.com"
     },
     "ga.fuquna.prefsgui.rosettaui": {
@@ -146,13 +136,6 @@
       "dependencies": {
         "ga.fuquna.prefsgui": "3.5.0"
       }
-    },
-    "ga.fuquna.rapidgui": {
-      "version": "1.2.3",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://registry.npmjs.com"
     },
     "ga.fuquna.rosettaui": {
       "version": "1.8.0",
