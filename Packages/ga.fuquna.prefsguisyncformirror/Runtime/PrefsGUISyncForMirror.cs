@@ -280,7 +280,7 @@ namespace PrefsGUI.Sync
                 
                 if (checkAlreadyGet && valueChangedAndAlreadyGet)
                 {
-                    Debug.LogWarning($"key:[{prefs.key}] Prefs.Get() called before sync. Application may be using pre-sync values.");
+                    Debug.LogWarning($"key:[{prefs.key}] Get() called before it was rewritten in sync. The application may be using pre-sync values, consider using PrefsGUISync.IsSpawnFinished or onSpawnFinished event.");
                 }
             }
             
