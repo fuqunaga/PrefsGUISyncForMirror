@@ -48,11 +48,13 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  enableDivideSpawnData: 0
   spawnDataBytesPerChunk: 100000
   debugLog: 0
   onSpawnFinished:
     m_PersistentCalls:
       m_Calls: []
+  syncOnlyValueChangedPrefs: 1
   ignoreKeyList: []
 --- !u!114 &4002032992138290990
 MonoBehaviour:

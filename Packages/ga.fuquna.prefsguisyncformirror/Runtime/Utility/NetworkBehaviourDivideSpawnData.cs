@@ -17,7 +17,7 @@ namespace PrefsGUI.Sync
     {
         #region Server parameters
         
-        public bool enableDivideSpawnData = true;
+        public bool enableDivideSpawnData;
         public int spawnDataBytesPerChunk = 100000;
         
         // すでに分割Spawnを開始したコネクションのリスト
