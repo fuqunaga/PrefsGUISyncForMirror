@@ -125,8 +125,11 @@ namespace PrefsGUI.Sync
                         bytes.Slice(sendPosition, sendSize),
                         lastSend
                     );
-                    
-                    DebugLog($"SendSpawnData syncObjectIndex:{syncObjectIndex} {sendPosition}/{bytes.Count}  lastSend:{lastSend}");
+
+                    if (debugLog)
+                    {
+                        DebugLog($"SendSpawnData syncObjectIndex:{syncObjectIndex} {sendPosition}/{bytes.Count}  lastSend:{lastSend}");
+                    }
                 }
             }
         }
@@ -134,6 +137,11 @@ namespace PrefsGUI.Sync
         [TargetRpc]
         private void TargetSendDividedSpawnData(NetworkConnectionToClient target, int syncObjectIndex, ArraySegment<byte> bytes, bool isLast)
         {
+            if (debugLog)
+            {
+                DebugLog($"ReceiveSpawnData syncObjectIndex:{syncObjectIndex} size:{bytes.Count}  isLast:{isLast}");
+            }
+            
             if ( _lastReceivedSyncObjectIndex >= 0 && _lastReceivedSyncObjectIndex != syncObjectIndex)
             {
                 Debug.LogWarning($"Received SyncObjectIndex is not match. Expected: {_lastReceivedSyncObjectIndex}, Received: {syncObjectIndex}");
@@ -160,8 +168,6 @@ namespace PrefsGUI.Sync
                     IsSpawnFinished = true;
                 }
             }
-            
-            DebugLog($"ReceiveSpawnData syncObjectIndex:{syncObjectIndex} size:{bytes.Count}  isLast:{isLast}");
         }
 
         
@@ -169,8 +175,11 @@ namespace PrefsGUI.Sync
         
         public override void OnSerialize(NetworkWriter writer, bool initialState)
         {
-            DebugLog($"{nameof(OnSerialize)} initialState:{initialState}");
-            
+            if (debugLog)
+            {
+                DebugLog($"{nameof(OnSerialize)} initialState:{initialState}");
+            }
+
             if (!enableDivideSpawnData)
             {
                 base.OnSerialize(writer, initialState);
@@ -209,8 +218,11 @@ namespace PrefsGUI.Sync
         
         public override void OnDeserialize(NetworkReader reader, bool initialState)
         {
-            DebugLog($"{nameof(OnDeserialize)} initialState:{initialState}");
-            
+            if (debugLog)
+            {
+                DebugLog($"{nameof(OnDeserialize)} initialState:{initialState}");
+            }
+
             if (!enableDivideSpawnData)
             {
                 base.OnDeserialize(reader, initialState);
@@ -262,10 +274,7 @@ namespace PrefsGUI.Sync
 
         protected virtual void DebugLog(string message)
         {
-            if ( debugLog )
-            {
-                Debug.Log($"{Time.frameCount} {message}");
-            }
+            Debug.Log($"FrameCount[{Time.frameCount}]: {message}");
         }
     }
 }
