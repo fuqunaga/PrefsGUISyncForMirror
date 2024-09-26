@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using UnityEngine;
+using System.Runtime.InteropServices;
 
 namespace kcp2k
 {
@@ -18,23 +18,26 @@ namespace kcp2k
         // events are readonly, set in constructor.
         // this ensures they are always initialized when used.
         // fixes https://github.com/MirrorNetworking/Mirror/issues/3337 and more
-        readonly Action<int> OnConnected;
-        readonly Action<int, ArraySegment<byte>, KcpChannel> OnData;
-        readonly Action<int> OnDisconnected;
-        readonly Action<int, ErrorCode, string> OnError;
+        protected readonly Action<int> OnConnected;
+        protected readonly Action<int, ArraySegment<byte>, KcpChannel> OnData;
+        protected readonly Action<int> OnDisconnected;
+        protected readonly Action<int, ErrorCode, string> OnError;
 
         // configuration
-        readonly KcpConfig config;
+        protected readonly KcpConfig config;
 
         // state
         protected Socket socket;
         EndPoint newClientEP;
 
+        // expose local endpoint for users / relays / nat traversal etc.
+        public EndPoint LocalEndPoint => socket?.LocalEndPoint;
+
         // raw receive buffer always needs to be of 'MTU' size, even if
         // MaxMessageSize is larger. kcp always sends in MTU segments and having
         // a buffer smaller than MTU would silently drop excess data.
         // => we need the mtu to fit channel + message!
-        protected readonly byte[] rawReceiveBuffer = new byte[Kcp.MTU_DEF];
+        protected readonly byte[] rawReceiveBuffer;
 
         // connections <connectionId, connection> where connectionId is EndPoint.GetHashCode
         public Dictionary<int, KcpServerConnection> connections =
@@ -53,6 +56,9 @@ namespace kcp2k
             this.OnError = OnError;
             this.config = config;
 
+            // create mtu sized receive buffer
+            rawReceiveBuffer = new byte[config.Mtu];
+
             // create newClientEP either IPv4 or IPv6
             newClientEP = config.DualMode
                           ? new IPEndPoint(IPAddress.IPv6Any, 0)
@@ -67,7 +73,8 @@ namespace kcp2k
             {
                 // IPv6 socket with DualMode @ "::" : port
                 Socket socket = new Socket(AddressFamily.InterNetworkV6, SocketType.Dgram, ProtocolType.Udp);
-                // settings DualMode may throw:
+
+                // enabling DualMode may throw:
                 // https://learn.microsoft.com/en-us/dotnet/api/System.Net.Sockets.Socket.DualMode?view=net-7.0
                 // attempt it, otherwise log but continue
                 // fixes: https://github.com/MirrorNetworking/Mirror/issues/3358
@@ -77,8 +84,56 @@ namespace kcp2k
                 }
                 catch (NotSupportedException e)
                 {
-                    Log.Warning($"Failed to set Dual Mode, continuing with IPv6 without Dual Mode. Error: {e}");
+                    Log.Warning($"[KCP] Failed to set Dual Mode, continuing with IPv6 without Dual Mode. Error: {e}");
                 }
+
+                // for windows sockets, there's a rare issue where when using
+                // a server socket with multiple clients, if one of the clients
+                // is closed, the single server socket throws exceptions when
+                // sending/receiving. even if the socket is made for N clients.
+                //
+                // this actually happened to one of our users:
+                // https://github.com/MirrorNetworking/Mirror/issues/3611
+                //
+                // here's the in-depth explanation & solution:
+                //
+                // "As you may be aware, if a host receives a packet for a UDP
+                // port that is not currently bound, it may send back an ICMP
+                // "Port Unreachable" message. Whether or not it does this is
+                // dependent on the firewall, private/public settings, etc.
+                // On localhost, however, it will pretty much always send this
+                // packet back.
+                //
+                // Now, on Windows (and only on Windows), by default, a received
+                // ICMP Port Unreachable message will close the UDP socket that
+                // sent it; hence, the next time you try to receive on the
+                // socket, it will throw an exception because the socket has
+                // been closed by the OS.
+                //
+                // Obviously, this causes a headache in the multi-client,
+                // single-server socket set-up you have here, but luckily there
+                // is a fix:
+                //
+                // You need to utilise the not-often-required SIO_UDP_CONNRESET
+                // Winsock control code, which turns off this built-in behaviour
+                // of automatically closing the socket.
+                //
+                // Note that this ioctl code is only supported on Windows
+                // (XP and later), not on Linux, since it is provided by the
+                // Winsock extensions. Of course, since the described behavior
+                // is only the default behavior on Windows, this omission is not
+                // a major loss. If you are attempting to create a
+                // cross-platform library, you should cordon this off as
+                // Windows-specific code."
+                // https://stackoverflow.com/questions/74327225/why-does-sending-via-a-udpclient-cause-subsequent-receiving-to-fail
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    const uint IOC_IN = 0x80000000U;
+                    const uint IOC_VENDOR = 0x18000000U;
+                    const int SIO_UDP_CONNRESET = unchecked((int)(IOC_IN | IOC_VENDOR | 12));
+                    socket.IOControl(SIO_UDP_CONNRESET, new byte[] { 0x00 }, null);
+                }
+
                 socket.Bind(new IPEndPoint(IPAddress.IPv6Any, port));
                 return socket;
             }
@@ -96,29 +151,27 @@ namespace kcp2k
             // only start once
             if (socket != null)
             {
-                Log.Warning("KcpServer: already started!");
+                Log.Warning("[KCP] Server: already started!");
                 return;
             }
 
             // listen
             socket = CreateServerSocket(config.DualMode, port);
 
-            // configure buffer sizes:
-            // if connections drop under heavy load, increase to OS limit.
-            // if still not enough, increase the OS limit.
-            if (config.MaximizeSocketBuffers)
-            {
-                Common.MaximizeSocketBuffers(socket);
-            }
-            // otherwise still log the defaults for info.
-            else Log.Info($"KcpServer: RecvBuf = {socket.ReceiveBufferSize} SendBuf = {socket.SendBufferSize}. If connections drop under heavy load, enable {nameof(KcpConfig.MaximizeSocketBuffers)} to increase it to OS limit. If they still drop, increase the OS limit.");
+            // recv & send are called from main thread.
+            // need to ensure this never blocks.
+            // even a 1ms block per connection would stop us from scaling.
+            socket.Blocking = false;
+
+            // configure buffer sizes
+            Common.ConfigureSocketBuffers(socket, config.RecvBufferSize, config.SendBufferSize);
         }
 
         public void Send(int connectionId, ArraySegment<byte> segment, KcpChannel channel)
         {
             if (connections.TryGetValue(connectionId, out KcpServerConnection connection))
             {
-                connection.peer.SendData(segment, channel);
+                connection.SendData(segment, channel);
             }
         }
 
@@ -126,7 +179,7 @@ namespace kcp2k
         {
             if (connections.TryGetValue(connectionId, out KcpServerConnection connection))
             {
-                connection.peer.Disconnect();
+                connection.Disconnect();
             }
         }
 
@@ -149,42 +202,24 @@ namespace kcp2k
         {
             segment = default;
             connectionId = 0;
+            if (socket == null) return false;
 
             try
             {
-                if (socket != null && socket.Poll(0, SelectMode.SelectRead))
+                if (socket.ReceiveFromNonBlocking(rawReceiveBuffer, out segment, ref newClientEP))
                 {
-                    // NOTE: ReceiveFrom allocates.
-                    //   we pass our IPEndPoint to ReceiveFrom.
-                    //   receive from calls newClientEP.Create(socketAddr).
-                    //   IPEndPoint.Create always returns a new IPEndPoint.
-                    //   https://github.com/mono/mono/blob/f74eed4b09790a0929889ad7fc2cf96c9b6e3757/mcs/class/System/System.Net.Sockets/Socket.cs#L1761
-                    //
-                    // throws SocketException if datagram was larger than buffer.
-                    // https://learn.microsoft.com/en-us/dotnet/api/system.net.sockets.socket.receive?view=net-6.0
-                    int size = socket.ReceiveFrom(rawReceiveBuffer, 0, rawReceiveBuffer.Length, SocketFlags.None, ref newClientEP);
-                    segment = new ArraySegment<byte>(rawReceiveBuffer, 0, size);
-
                     // set connectionId to hash from endpoint
-                    // NOTE: IPEndPoint.GetHashCode() allocates.
-                    //  it calls m_Address.GetHashCode().
-                    //  m_Address is an IPAddress.
-                    //  GetHashCode() allocates for IPv6:
-                    //  https://github.com/mono/mono/blob/bdd772531d379b4e78593587d15113c37edd4a64/mcs/class/referencesource/System/net/System/Net/IPAddress.cs#L699
-                    //
-                    // => using only newClientEP.Port wouldn't work, because
-                    //    different connections can have the same port.
-                    connectionId = newClientEP.GetHashCode();
+                    connectionId = Common.ConnectionHash(newClientEP);
                     return true;
                 }
             }
-            // this is fine, the socket might have been closed in the other end
-            catch (SocketException ex)
+            catch (SocketException e)
             {
+                // NOTE: SocketException is not a subclass of IOException.
                 // the other end closing the connection is not an 'error'.
                 // but connections should never just end silently.
                 // at least log a message for easier debugging.
-                Log.Info($"KcpServer: poll & read failed: {ex}");
+                Log.Info($"[KCP] Server: ReceiveFrom failed: {e}");
             }
 
             return false;
@@ -198,46 +233,48 @@ namespace kcp2k
             // get the connection's endpoint
             if (!connections.TryGetValue(connectionId, out KcpServerConnection connection))
             {
-                Debug.LogWarning($"KcpServer: RawSend invalid connectionId={connectionId}");
+                Log.Warning($"[KCP] Server: RawSend invalid connectionId={connectionId}");
                 return;
             }
 
-            // send to the the endpoint.
-            // do not send to 'newClientEP', as that's always reused.
-            // fixes https://github.com/MirrorNetworking/Mirror/issues/3296
-            socket.SendTo(data.Array, data.Offset, data.Count, SocketFlags.None, connection.remoteEndPoint);
+            try
+            {
+                socket.SendToNonBlocking(data, connection.remoteEndPoint);
+            }
+            catch (SocketException e)
+            {
+                Log.Error($"[KCP] Server: SendTo failed: {e}");
+            }
         }
 
         protected virtual KcpServerConnection CreateConnection(int connectionId)
         {
-            // events need to be wrapped with connectionIds
-            Action<ArraySegment<byte>> RawSendWrap =
-                data => RawSend(connectionId, data);
+            // generate a random cookie for this connection to avoid UDP spoofing.
+            // needs to be random, but without allocations to avoid GC.
+            uint cookie = Common.GenerateCookie();
 
             // create empty connection without peer first.
             // we need it to set up peer callbacks.
             // afterwards we assign the peer.
-            KcpServerConnection connection = new KcpServerConnection(newClientEP);
+            // events need to be wrapped with connectionIds
+            KcpServerConnection connection = new KcpServerConnection(
+                OnConnectedCallback,
+                (message,  channel) => OnData(connectionId, message, channel),
+                OnDisconnectedCallback,
+                (error, reason) => OnError(connectionId, error, reason),
+                (data) => RawSend(connectionId, data),
+                config,
+                cookie,
+                newClientEP);
 
-            // set up peer with callbacks
-            KcpPeer peer = new KcpPeer(RawSendWrap, OnAuthenticatedWrap, OnDataWrap, OnDisconnectedWrap, OnErrorWrap, config);
-
-            // assign peer to connection
-            connection.peer = peer;
             return connection;
 
             // setup authenticated event that also adds to connections
-            void OnAuthenticatedWrap()
+            void OnConnectedCallback(KcpServerConnection conn)
             {
-                // only send handshake to client AFTER we received his
-                // handshake in OnAuthenticated.
-                // we don't want to reply to random internet messages
-                // with handshakes each time.
-                connection.peer.SendHandshake();
-
                 // add to connections dict after being authenticated.
-                connections.Add(connectionId, connection);
-                Log.Info($"KcpServer: added connection({connectionId})");
+                connections.Add(connectionId, conn);
+                Log.Info($"[KCP] Server: added connection({connectionId})");
 
                 // setup Data + Disconnected events only AFTER the
                 // handshake. we don't want to fire OnServerDisconnected
@@ -246,20 +283,12 @@ namespace kcp2k
 
                 // setup data event
 
-
                 // finally, call mirror OnConnected event
-                Log.Info($"KcpServer: OnConnected({connectionId})");
+                Log.Info($"[KCP] Server: OnConnected({connectionId})");
                 OnConnected(connectionId);
             }
 
-            void OnDataWrap(ArraySegment<byte> message, KcpChannel channel)
-            {
-                // call mirror event
-                //Log.Info($"KCP: OnServerDataReceived({connectionId}, {BitConverter.ToString(message.Array, message.Offset, message.Count)})");
-                OnData(connectionId, message, channel);
-            }
-
-            void OnDisconnectedWrap()
+            void OnDisconnectedCallback()
             {
                 // flag for removal
                 // (can't remove directly because connection is updated
@@ -267,13 +296,8 @@ namespace kcp2k
                 connectionsToRemove.Add(connectionId);
 
                 // call mirror event
-                Log.Info($"KcpServer: OnDisconnected({connectionId})");
+                Log.Info($"[KCP] Server: OnDisconnected({connectionId})");
                 OnDisconnected(connectionId);
-            }
-
-            void OnErrorWrap(ErrorCode error, string reason)
-            {
-                OnError(connectionId, error, reason);
             }
         }
 
@@ -281,7 +305,7 @@ namespace kcp2k
         // best to call this as long as there is more data to receive.
         void ProcessMessage(ArraySegment<byte> segment, int connectionId)
         {
-            //Log.Info($"KCP: server raw recv {msgLength} bytes = {BitConverter.ToString(buffer, 0, msgLength)}");
+            //Log.Info($"[KCP] server raw recv {msgLength} bytes = {BitConverter.ToString(buffer, 0, msgLength)}");
 
             // is this a new connection?
             if (!connections.TryGetValue(connectionId, out KcpServerConnection connection))
@@ -313,8 +337,8 @@ namespace kcp2k
                 // connected event was set up.
                 // tick will process the first message and adds the
                 // connection if it was the handshake.
-                connection.peer.RawInput(segment);
-                connection.peer.TickIncoming();
+                connection.RawInput(segment);
+                connection.TickIncoming();
 
                 // again, do not add to connections.
                 // if the first message wasn't the kcp handshake then
@@ -323,7 +347,7 @@ namespace kcp2k
             // existing connection: simply input the message into kcp
             else
             {
-                connection.peer.RawInput(segment);
+                connection.RawInput(segment);
             }
         }
 
@@ -342,7 +366,7 @@ namespace kcp2k
             // (even if we didn't receive anything. need to tick ping etc.)
             foreach (KcpServerConnection connection in connections.Values)
             {
-                connection.peer.TickIncoming();
+                connection.TickIncoming();
             }
 
             // remove disconnected connections
@@ -362,7 +386,7 @@ namespace kcp2k
             // flush all server connections
             foreach (KcpServerConnection connection in connections.Values)
             {
-                connection.peer.TickOutgoing();
+                connection.TickOutgoing();
             }
         }
 
@@ -377,6 +401,9 @@ namespace kcp2k
 
         public virtual void Stop()
         {
+            // need to clear connections, otherwise they are in next session.
+            // fixes https://github.com/vis2k/kcp2k/pull/47
+            connections.Clear();
             socket?.Close();
             socket = null;
         }
