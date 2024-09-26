@@ -52,9 +52,12 @@ or set `prefs`'s key to `PrefsGUISyncForMirror.ignoreKeyList`.
 
 You can set whether to synchronize with the sync toggle.
 
+
 ## Reduces the amount of data sent
 
 ### Sync only value changed `prefs`
+
+<img width="404" alt="image" src="https://github.com/user-attachments/assets/7c847d14-2659-466e-88cb-bfcd1c6a6d1e">
 
 * Default: *on*.
 * `PrefsGUISyncForMirror` only sends `prefs` that have changed from their default values.
@@ -63,18 +66,25 @@ You can set whether to synchronize with the sync toggle.
 
 ### Divide spawn data
 
+<img width="404" alt="image" src="https://github.com/user-attachments/assets/8c966b1e-e5f2-4de0-b6f7-e7f30c24892b">
+
 * Default: *off*.
 * `PrefsGUISyncForMirror` sends all sync target `prefs` values when connecting to a client.
 * If the data is too large, it may cause an error due to Mirror's capacity limit (approximately 300 kbytes).  
-`NetworkConnection.Send: message of type Mirror.SpawnMessage with a size of [*] bytes is larger than the max allowed message size in one batch: 297421.`
+```
+NetworkConnection.Send: message of type Mirror.SpawnMessage with a size of [*] bytes is larger than the max allowed message size in one batch: 297421.
+```
 * Setting `enableDivideSpawnData` to `true` will divide the data and send it in smaller packets.
+* When using this feature, there may be cases where `PrefsGUISyncForMirror.enabled == true` on the client side, but the reception of the `prefs` values has not yet been completed.
+* Please monitor the completion of the reception using either `PrefsGUISyncForMirror.IsSpawnFinished` or the `onSpawnFinished` event.
+
 
 
 ### Consider using transport other than [KCP] such as [Telepathy]
 
 * Mirror's capacity limitation is derived from [KCP Transport][KCP].
 * If you encounter capacity limit errors, consider using a transport protocol other than KCP.
-* For instance, Telepathy can handle larger amounts of data by configuring an appropriate buffer size.
+* For instance, [Telepathy] can handle larger amounts of data by configuring an appropriate buffer size.
 
 [KCP]: https://mirror-networking.gitbook.io/docs/manual/transports/kcp-transport
 [Telepathy]: https://mirror-networking.gitbook.io/docs/manual/transports/telepathy-transport
