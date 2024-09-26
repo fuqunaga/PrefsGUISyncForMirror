@@ -1,3 +1,18 @@
+## [1.0.5](https://github.com/fuqunaga/PrefsGUISyncForMirror/compare/v1.0.4...v1.0.5) (2024-09-26)
+
+
+### Bug Fixes
+
+* error when entering PlayMode while PrefsGUIEditorWindow is open. ([4402746](https://github.com/fuqunaga/PrefsGUISyncForMirror/commit/4402746f58595e44e912485441a9034f222c9ae6))
+* Over capacity error with Spawn data in PrefsGUISync. Split transmission. ([5915707](https://github.com/fuqunaga/PrefsGUISyncForMirror/commit/5915707e35b99e6a06485a05dab0876292a89da4))
+* PrefsGUISyncEditorRosettaUI support new RosettaUI style ([2bcf39c](https://github.com/fuqunaga/PrefsGUISyncForMirror/commit/2bcf39c04fe981e2f63ae36676a995cf5b16d83b))
+* SyncDicionary callback warning ([a15dedf](https://github.com/fuqunaga/PrefsGUISyncForMirror/commit/a15dedf2fa37027e585587a6890bfc64826321da))
+
+
+### Performance Improvements
+
+* Serialize only changed Prefs in PrefsGUISyncForMirror.SendPrefs(). ([30d4222](https://github.com/fuqunaga/PrefsGUISyncForMirror/commit/30d4222731f2c259727aa0be1ec3d1f931aabf36))
+
 ## [1.0.4](https://github.com/fuqunaga/PrefsGUISyncForMirror/compare/v1.0.3...v1.0.4) (2023-04-24)
 
 
