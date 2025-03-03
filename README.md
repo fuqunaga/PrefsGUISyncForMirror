@@ -1,5 +1,8 @@
 # PrefsGUISync For Mirror
 
+[![npm version](https://badge.fury.io/js/ga.fuquna.prefsguisyncformirror.svg)](https://badge.fury.io/js/ga.fuquna.prefsguisyncformirror)
+[![openupm](https://img.shields.io/npm/v/ga.fuquna.prefsguisyncformirror?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/ga.fuquna.prefsguisyncformirror/)
+
 Synchronization subset for [PrefsGUI](https://github.com/fuqunaga/PrefsGUI) over [Mirror](https://github.com/vis2k/Mirror).
 
 ![](Documentation~/prefsguisync.webp)
