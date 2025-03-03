@@ -1,3 +1,10 @@
+## [1.0.6](https://github.com/fuqunaga/PrefsGUISyncForMirror/compare/v1.0.5...v1.0.6) (2025-03-03)
+
+
+### Bug Fixes
+
+* Add keywords to package.json to get hits in npmjs search ([ead74c1](https://github.com/fuqunaga/PrefsGUISyncForMirror/commit/ead74c16ad4c46becae2b066570af32d950aad24))
+
 ## [1.0.5](https://github.com/fuqunaga/PrefsGUISyncForMirror/compare/v1.0.4...v1.0.5) (2024-09-26)
 
 
