@@ -15,7 +15,7 @@ namespace PrefsGUI.Sync.Editor
             {
                 if (_sync == null)
                 {
-                    _sync = Object.FindObjectOfType<PrefsGUISyncForMirror>();
+                    _sync = Object.FindFirstObjectByType<PrefsGUISyncForMirror>();
                 }
 
                 return _sync;
