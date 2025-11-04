@@ -13,7 +13,7 @@
   ],
   "category": "Tool",
   "dependencies": {
-    "ga.fuquna.prefsgui": "3.6.0"
+    "ga.fuquna.prefsgui": "3.7.0"
   },
   "author": {
     "name": "fuqunaga",
